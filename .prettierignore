@@ -1,0 +1,19 @@
+# Build output
+dist
+build
+coverage
+
+# Dependencies
+node_modules
+
+# Configs & Locks
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Local env files
+.env
+.env.*
+
+# TypeScript build cache
+*.tsbuildinfo
