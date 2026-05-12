@@ -1,0 +1,10 @@
+query Accounts($walletId: ID!) {
+  accounts(walletId: $walletId) {
+    id
+    name
+    type
+    balance
+    currency
+    lastUpdated
+  }
+}

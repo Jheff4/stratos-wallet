@@ -1,0 +1,76 @@
+type Account {
+  id: ID!
+  name: String!
+  type: AccountType!
+  balance: Float!
+  currency: String!
+  lastUpdated: String!
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  INVESTMENT
+}
+
+type Wallet {
+  id: ID!
+  label: String!
+  accounts: [Account!]!
+}
+
+type Transaction {
+  id: ID!
+  amount: Float!
+  currency: String!
+  type: TransactionType!
+  description: String!
+  createdAt: String!
+  sourceAccountId: ID!
+  destinationAccountId: ID!
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
+
+type Query {
+  wallets: [Wallet!]!
+  accounts(walletId: ID!): [Account!]!
+  transactions(
+    accountId: ID
+    limit: Int
+    cursor: String
+  ): TransactionConnection!
+}
+
+type TransactionConnection {
+  edges: [TransactionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TransactionEdge {
+  node: Transaction!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type Mutation {
+  createWallet(label: String!): Wallet!
+  transferFunds(
+    fromAccountId: ID!
+    toAccountId: ID!
+    amount: Float!
+  ): TransferPayload
+}
+
+type TransferPayload {
+  success: Boolean!
+  transaction: Transaction
+}

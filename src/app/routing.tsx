@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
-import AccountListPage from '../features/accounts/AccountListPage'
-import LoginPage from '../features/auth/LoginPage'
-import DashboardPage from '../features/dashboard/DashboardPage'
-import TradingPage from '../features/trading/TradingPage'
-import TransactionHistoryPage from '../features/transactions/TransactionHistoryPage'
+import AccountListPage from '@features/accounts/AccountListPage'
+import LoginPage from '@features/auth/LoginPage'
+import DashboardPage from '@features/dashboard/DashboardPage'
+import TradingPage from '@features/trading/TradingPage'
+import TransactionHistoryPage from '@features/transactions/TransactionHistoryPage'
+import WalletsPage from '@features/wallets/WalletsPage';
 
 export type AppRoute = {
   path: string
@@ -35,6 +36,12 @@ export const routes = [
     path: '/trading',
     label: 'Trading',
     element: <TradingPage />,
+    requiresAuth: true,
+  },
+  {
+    path: '/wallets',
+    label: 'Wallets',
+    element: <WalletsPage />,
     requiresAuth: true,
   },
   {

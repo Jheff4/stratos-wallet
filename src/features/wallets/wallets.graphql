@@ -1,0 +1,18 @@
+query Wallets {
+  wallets {
+    id
+    label
+    accounts {
+      id
+      name
+      balance
+    }
+  }
+}
+
+mutation CreateWallet($label: String!) {
+  createWallet(label: $label) {
+    id
+    label
+  }
+}
