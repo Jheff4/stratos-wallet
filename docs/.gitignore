@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# production build
+build/
+
+# docusaurus generated files
+.docusaurus/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
