@@ -7,7 +7,7 @@ npm install
 npm run dev
 \`\`\`
 
-The app runs on `http://localhost:5173`.
+The app runs on `http://localhost:7701`.
 
 To run the docs site:
 
