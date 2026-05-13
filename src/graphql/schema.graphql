@@ -67,6 +67,7 @@ type Mutation {
     fromAccountId: ID!
     toAccountId: ID!
     amount: Float!
+    idempotencyKey: String!
   ): TransferPayload
 }
 

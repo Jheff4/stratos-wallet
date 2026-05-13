@@ -1,0 +1,21 @@
+mutation TransferFunds(
+  $fromAccountId: ID!
+  $toAccountId: ID!
+  $amount: Float!
+  $idempotencyKey: String!
+) {
+  transferFunds(
+    fromAccountId: $fromAccountId
+    toAccountId: $toAccountId
+    amount: $amount
+    idempotencyKey: $idempotencyKey
+  ) {
+    success
+    transaction {
+      id
+      amount
+      currency
+      createdAt
+    }
+  }
+}

@@ -8,7 +8,6 @@ export default defineConfig({
     alias: {
       '@features': path.resolve(__dirname, 'src/features'),
       '@shared': path.resolve(__dirname, 'src/shared'),
-      '@app': path.resolve(__dirname, 'src/app'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@graphql': path.resolve(__dirname, 'src/graphql'),
     },

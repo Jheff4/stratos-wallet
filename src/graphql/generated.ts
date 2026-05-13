@@ -36,6 +36,16 @@ export type AccountsQueryVariables = Exact<{
 
 export type AccountsQuery = { accounts: Array<{ id: string, name: string, type: AccountType, balance: number, currency: string, lastUpdated: string }> };
 
+export type TransferFundsMutationVariables = Exact<{
+  fromAccountId: string | number;
+  toAccountId: string | number;
+  amount: number;
+  idempotencyKey: string;
+}>;
+
+
+export type TransferFundsMutation = { transferFunds: { success: boolean, transaction: { id: string, amount: number, currency: string, createdAt: string } | null } | null };
+
 export type WalletsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -83,6 +93,41 @@ useAccountsQuery.getKey = (variables: AccountsQueryVariables) => ['Accounts', va
 
 
 useAccountsQuery.fetcher = (variables: AccountsQueryVariables) => fetcher<AccountsQuery, AccountsQueryVariables>(AccountsDocument, variables);
+
+export const TransferFundsDocument = new TypedDocumentString(`
+    mutation TransferFunds($fromAccountId: ID!, $toAccountId: ID!, $amount: Float!, $idempotencyKey: String!) {
+  transferFunds(
+    fromAccountId: $fromAccountId
+    toAccountId: $toAccountId
+    amount: $amount
+    idempotencyKey: $idempotencyKey
+  ) {
+    success
+    transaction {
+      id
+      amount
+      currency
+      createdAt
+    }
+  }
+}
+    `);
+
+export const useTransferFundsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TransferFundsMutation, TError, TransferFundsMutationVariables, TContext>) => {
+    
+    return useMutation<TransferFundsMutation, TError, TransferFundsMutationVariables, TContext>(
+      {
+    mutationKey: ['TransferFunds'],
+    mutationFn: (variables?: TransferFundsMutationVariables) => fetcher<TransferFundsMutation, TransferFundsMutationVariables>(TransferFundsDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useTransferFundsMutation.fetcher = (variables: TransferFundsMutationVariables) => fetcher<TransferFundsMutation, TransferFundsMutationVariables>(TransferFundsDocument, variables);
 
 export const WalletsDocument = new TypedDocumentString(`
     query Wallets {

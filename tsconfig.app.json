@@ -5,7 +5,6 @@
     "paths": {
       "@features/*": ["src/features/*"],
       "@shared/*": ["src/shared/*"],
-      "@app/*": ["src/app/*"],
       "@config/*": ["src/config/*"],
       "@graphql/*": ["src/graphql/*"]
     },

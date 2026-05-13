@@ -4,7 +4,8 @@ import LoginPage from '@features/auth/LoginPage'
 import DashboardPage from '@features/dashboard/DashboardPage'
 import TradingPage from '@features/trading/TradingPage'
 import TransactionHistoryPage from '@features/transactions/TransactionHistoryPage'
-import WalletsPage from '@features/wallets/WalletsPage';
+import WalletsPage from '@features/wallets/WalletsPage'
+import TransferPage from '@features/transfers/TransferPage'
 
 export type AppRoute = {
   path: string
@@ -42,6 +43,12 @@ export const routes = [
     path: '/wallets',
     label: 'Wallets',
     element: <WalletsPage />,
+    requiresAuth: true,
+  },
+  {
+    path: '/transfers',
+    label: 'Transfers',
+    element: <TransferPage />,
     requiresAuth: true,
   },
   {
