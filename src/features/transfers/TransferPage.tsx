@@ -13,52 +13,44 @@ export default function TransferPage() {
 
   const transferMutation = useTransferFundsMutation({
     onMutate: async ({ fromAccountId, toAccountId, amount }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: ['Accounts', { walletId: 'w1' }] });
 
-      // Snapshot the previous value
+      // Snapshot the ORIGINAL data (before any optimistic updates)
       const previousAccounts = queryClient.getQueryData(['Accounts', { walletId: 'w1' }]);
 
-      // Optimistically update the cache
+      // Optimistically update
       queryClient.setQueryData(['Accounts', { walletId: 'w1' }], (old: any) => {
         if (!old?.accounts) return old;
         return {
           accounts: old.accounts.map((acc: any) => {
-            if (acc.id === fromAccountId) {
-              return { ...acc, balance: acc.balance - amount };
-            }
-            if (acc.id === toAccountId) {
-              return { ...acc, balance: acc.balance + amount };
-            }
+            if (acc.id === fromAccountId) return { ...acc, balance: acc.balance - amount };
+            if (acc.id === toAccountId) return { ...acc, balance: acc.balance + amount };
             return acc;
           }),
         };
       });
 
-      // Return the snapshot for rollback
       return { previousAccounts };
     },
-
-    onSuccess: (data) => {
-      if (data.transferFunds?.success) {
-        setMessage('Transfer successful!');
-        // Invalidate to ensure final server truth
-        queryClient.invalidateQueries({ queryKey: ['Accounts', { walletId: 'w1' }] });
-      } else {
-        setMessage('Transfer failed. Check balance.');
-        // Rollback if server said no
-        queryClient.invalidateQueries({ queryKey: ['Accounts', { walletId: 'w1' }] });
-      }
-    },
-
     onError: (_error, _variables, context) => {
-      setMessage('Network error. Changes rolled back.');
-      // Rollback to the snapshot
       if (context?.previousAccounts) {
         queryClient.setQueryData(['Accounts', { walletId: 'w1' }], context.previousAccounts);
       }
+      setMessage('Transfer failed. Rolled back.');
     },
-    retry: false, // Never retry a financial mutation automatically
+    onSettled: () => {
+      // Always refetch the server truth after mutation settles
+      queryClient.invalidateQueries({ queryKey: ['Accounts', { walletId: 'w1' }] });
+      queryClient.invalidateQueries({ queryKey: ['Wallets'] });
+    },
+    onSuccess: (data) => {
+      if (data.transferFunds?.success) {
+        setMessage('Transfer successful!');
+      } else {
+        setMessage('Transfer failed. Check balance.');
+      }
+    },
+    retry: false,
   });
 
   const handleSubmit = () => {
