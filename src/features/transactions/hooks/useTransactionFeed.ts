@@ -12,7 +12,7 @@ export function useTransactionFeed(accountId?: string, first = 10) {
   } satisfies TransactionsQueryVariables;
 
   return useInfiniteQuery<TransactionsQuery>({
-    queryKey: ['Transactions.infinite', variables],
+    queryKey: ['Transactions.infinite', accountId, first],
     queryFn: ({ pageParam }) =>
       useTransactionsQuery.fetcher({
         ...variables,
