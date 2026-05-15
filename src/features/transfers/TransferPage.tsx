@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAccountsQuery, useTransferFundsMutation } from '@graphql/generated';
+import { useAccountsQuery, useTransferFundsMutation, type AccountsQuery } from '@graphql/generated';
 import { queryClient } from '../../queryClient';
 
 export default function TransferPage() {
@@ -19,10 +19,10 @@ export default function TransferPage() {
       const previousAccounts = queryClient.getQueryData(['Accounts', { walletId: 'w1' }]);
 
       // Optimistically update
-      queryClient.setQueryData(['Accounts', { walletId: 'w1' }], (old: any) => {
+      queryClient.setQueryData(['Accounts', { walletId: 'w1' }], (old: AccountsQuery | undefined) => {
         if (!old?.accounts) return old;
         return {
-          accounts: old.accounts.map((acc: any) => {
+          accounts: old.accounts.map((acc) => {
             if (acc.id === fromAccountId) return { ...acc, balance: acc.balance - amount };
             if (acc.id === toAccountId) return { ...acc, balance: acc.balance + amount };
             return acc;

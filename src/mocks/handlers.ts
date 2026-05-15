@@ -1,7 +1,41 @@
 import { graphql, HttpResponse } from 'msw';
 import { mockWallets } from './data';
+import type { TransferFundsMutation } from '@graphql/generated';
 
-const idempotencyStore = new Map<string, any>();
+type MockTransaction = {
+  id: string;
+  amount: number;
+  currency: string;
+  type: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER';
+  description: string;
+  createdAt: string;
+  sourceAccountId: string;
+  destinationAccountId: string;
+};
+
+const idempotencyStore = new Map<string, TransferFundsMutation>();
+
+// Generate 50 mock transactions for pagination testing
+function generateMockTransactions() {
+  const transactions: MockTransaction[] = [];
+  const types = ['DEPOSIT', 'WITHDRAWAL', 'TRANSFER'] as const;
+  const descriptions = ['Salary deposit', 'ATM withdrawal', 'Transfer to savings', 'Online purchase', 'Interest payment'];
+  for (let i = 0; i < 50; i++) {
+    transactions.push({
+      id: `t${i}`,
+      amount: Math.round(Math.random() * 1000 * 100) / 100,
+      currency: 'USD',
+      type: types[Math.floor(Math.random() * types.length)],
+      description: descriptions[Math.floor(Math.random() * descriptions.length)],
+      createdAt: new Date(Date.now() - i * 3600000).toISOString(), // one per hour
+      sourceAccountId: `a${Math.random() > 0.5 ? 1 : 2}`,
+      destinationAccountId: `a${Math.random() > 0.5 ? 2 : 1}`,
+    });
+  }
+  return transactions;
+}
+
+const allTransactions = generateMockTransactions();
 
 export const handlers = [
   // Query: wallets
@@ -21,16 +55,49 @@ export const handlers = [
   }),
 
   // Query: transactions (simplified for now)
-  graphql.query('Transactions', () => {
-    return HttpResponse.json({
-      data: {
-        transactions: {
-          edges: [],
-          pageInfo: { hasNextPage: false, endCursor: null },
+  graphql.query(
+    'Transactions',
+    ({
+      variables,
+    }: {
+      variables: { accountId?: string; first?: number; after?: string | null };
+    }) => {
+      const { accountId, first = 10, after } = variables;
+
+      // Filter by account if provided
+      let filtered = allTransactions;
+      if (accountId) {
+        filtered = allTransactions.filter(
+          (t) => t.sourceAccountId === accountId || t.destinationAccountId === accountId,
+        );
+      }
+
+      // Cursor pagination
+      let startIndex = 0;
+      if (after) {
+        const afterIndex = filtered.findIndex((t) => t.id === after);
+        if (afterIndex >= 0) startIndex = afterIndex + 1;
+      }
+      const sliced = filtered.slice(startIndex, startIndex + first);
+      const endCursor = sliced.length > 0 ? sliced[sliced.length - 1].id : null;
+      const hasNextPage = startIndex + first < filtered.length;
+
+      return HttpResponse.json({
+        data: {
+          transactions: {
+            edges: sliced.map((t) => ({
+              node: t,
+              cursor: t.id,
+            })),
+            pageInfo: {
+              hasNextPage,
+              endCursor,
+            },
+          },
         },
-      },
-    });
-  }),
+      });
+    },
+  ),
 
   // Mutation: createWallet
   graphql.mutation('CreateWallet', ({ variables }: { variables: { label: string } }) => {
@@ -57,26 +124,20 @@ export const handlers = [
     if (receiverAccount) {
       receiverAccount.balance += amount;
     }
-    const result = {
-      data: {
-        transferFunds: {
-          success: true,
-          transaction: {
-            id: `t${Date.now()}`,
-            amount,
-            currency: 'USD',
-            type: 'TRANSFER',
-            description: `Transfer of ${amount}`,
-            createdAt: new Date().toISOString(),
-            sourceAccountId: fromAccountId,
-            destinationAccountId: toAccountId,
-          },
+    const result: TransferFundsMutation = {
+      transferFunds: {
+        success: true,
+        transaction: {
+          id: `t${Date.now()}`,
+          amount,
+          currency: 'USD',
+          createdAt: new Date().toISOString(),
         },
       },
     };
     if (idempotencyKey) {
       idempotencyStore.set(idempotencyKey, result);
     }
-    return HttpResponse.json(result);
+    return HttpResponse.json({ data: result });
   }),
 ];

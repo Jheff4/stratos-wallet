@@ -1,0 +1,21 @@
+query Transactions($accountId: ID, $first: Int, $after: String) {
+  transactions(accountId: $accountId, first: $first, after: $after) {
+    edges {
+      node {
+        id
+        amount
+        currency
+        type
+        description
+        createdAt
+        sourceAccountId
+        destinationAccountId
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

@@ -29,12 +29,26 @@ export type AccountType =
   | 'INVESTMENT'
   | 'SAVINGS';
 
+export type TransactionType =
+  | 'DEPOSIT'
+  | 'TRANSFER'
+  | 'WITHDRAWAL';
+
 export type AccountsQueryVariables = Exact<{
   walletId: string | number;
 }>;
 
 
 export type AccountsQuery = { accounts: Array<{ id: string, name: string, type: AccountType, balance: number, currency: string, lastUpdated: string }> };
+
+export type TransactionsQueryVariables = Exact<{
+  accountId?: string | number | null | undefined;
+  first?: number | null | undefined;
+  after?: string | null | undefined;
+}>;
+
+
+export type TransactionsQuery = { transactions: { edges: Array<{ cursor: string, node: { id: string, amount: number, currency: string, type: TransactionType, description: string, createdAt: string, sourceAccountId: string, destinationAccountId: string } }>, pageInfo: { hasNextPage: boolean, endCursor: string | null } } };
 
 export type TransferFundsMutationVariables = Exact<{
   fromAccountId: string | number;
@@ -93,6 +107,51 @@ useAccountsQuery.getKey = (variables: AccountsQueryVariables) => ['Accounts', va
 
 
 useAccountsQuery.fetcher = (variables: AccountsQueryVariables) => fetcher<AccountsQuery, AccountsQueryVariables>(AccountsDocument, variables);
+
+export const TransactionsDocument = new TypedDocumentString(`
+    query Transactions($accountId: ID, $first: Int, $after: String) {
+  transactions(accountId: $accountId, first: $first, after: $after) {
+    edges {
+      node {
+        id
+        amount
+        currency
+        type
+        description
+        createdAt
+        sourceAccountId
+        destinationAccountId
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `);
+
+export const useTransactionsQuery = <
+      TData = TransactionsQuery,
+      TError = unknown
+    >(
+      variables?: TransactionsQueryVariables,
+      options?: Omit<UseQueryOptions<TransactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TransactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TransactionsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['Transactions'] : ['Transactions', variables],
+    queryFn: fetcher<TransactionsQuery, TransactionsQueryVariables>(TransactionsDocument, variables),
+    ...options
+  }
+    )};
+
+useTransactionsQuery.getKey = (variables?: TransactionsQueryVariables) => variables === undefined ? ['Transactions'] : ['Transactions', variables];
+
+
+useTransactionsQuery.fetcher = (variables?: TransactionsQueryVariables) => fetcher<TransactionsQuery, TransactionsQueryVariables>(TransactionsDocument, variables);
 
 export const TransferFundsDocument = new TypedDocumentString(`
     mutation TransferFunds($fromAccountId: ID!, $toAccountId: ID!, $amount: Float!, $idempotencyKey: String!) {

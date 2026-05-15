@@ -2,9 +2,20 @@
 
 ## Purpose
 
-Display transaction history with pagination and filtering (coming soon).
+Display a paginated, infinite-scroll transaction history.
+
+## Pagination
+
+Cursor-based pagination is used to prevent duplicates when new transactions arrive in real-time. The feed supports `first` and `after` parameters.
 
 ## Components
 
-- `TransactionHistoryPage`: full page for transaction list.
-- `TransactionWidget`: placeholder for recent transactions on dashboard.
+- `TransactionHistoryPage` – Main feed with infinite scroll.
+
+## Public API
+
+- `useInfiniteTransactionQuery` – Auto-generated infinite query hook.
+
+## State
+
+React Query’s `useInfiniteQuery` manages pages, caching, and fetching. Cursor is passed via page parameters.

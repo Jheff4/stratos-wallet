@@ -39,11 +39,7 @@ enum TransactionType {
 type Query {
   wallets: [Wallet!]!
   accounts(walletId: ID!): [Account!]!
-  transactions(
-    accountId: ID
-    limit: Int
-    cursor: String
-  ): TransactionConnection!
+  transactions(accountId: ID, first: Int, after: String): TransactionConnection!
 }
 
 type TransactionConnection {

@@ -16,6 +16,7 @@
     "graphql": "^16.14.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-intersection-observer": "^10.0.3",
     "react-router-dom": "^7.15.0",
     "zustand": "^5.0.13"
   },
