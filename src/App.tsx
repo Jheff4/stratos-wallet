@@ -1,7 +1,9 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { routes } from './routing'
+import { useTransactionSubscription } from '@shared/hooks/useTransactionSubscription';
 
 function App() {
+  useTransactionSubscription();
   return (
     <BrowserRouter>
       <nav>
