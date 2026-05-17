@@ -1,0 +1,21 @@
+query BalanceHistory($walletId: ID!) {
+  balanceHistory(walletId: $walletId) {
+    date
+    balance
+  }
+}
+
+query SpendingByCategory(
+  $walletId: ID!
+  $startDate: String!
+  $endDate: String!
+) {
+  spendingByCategory(
+    walletId: $walletId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    category
+    amount
+  }
+}

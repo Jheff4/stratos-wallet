@@ -71,3 +71,22 @@ type TransferPayload {
   success: Boolean!
   transaction: Transaction
 }
+
+type BalanceSnapshot {
+  date: String!
+  balance: Float!
+}
+
+type SpendingCategory {
+  category: String!
+  amount: Float!
+}
+
+extend type Query {
+  balanceHistory(walletId: ID!): [BalanceSnapshot!]!
+  spendingByCategory(
+    walletId: ID!
+    startDate: String!
+    endDate: String!
+  ): [SpendingCategory!]!
+}

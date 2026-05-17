@@ -39,9 +39,12 @@ export default function TransferPage() {
       setMessage('Transfer failed. Rolled back.');
     },
     onSettled: () => {
-      // Always refetch the server truth after mutation settles
-      queryClient.invalidateQueries({ queryKey: ['Accounts', { walletId: 'w1' }] });
+      // Refresh all related queries to ensure UI is in sync with server
+      queryClient.invalidateQueries({ queryKey: ['Accounts'] });
       queryClient.invalidateQueries({ queryKey: ['Wallets'] });
+      queryClient.invalidateQueries({ queryKey: ['BalanceHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['SpendingByCategory'] });
+      queryClient.invalidateQueries({ queryKey: ['Transactions.infinite'] });
     },
     onSuccess: (data) => {
       if (data.transferFunds?.success) {

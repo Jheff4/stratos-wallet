@@ -41,6 +41,22 @@ export type AccountsQueryVariables = Exact<{
 
 export type AccountsQuery = { accounts: Array<{ id: string, name: string, type: AccountType, balance: number, currency: string, lastUpdated: string }> };
 
+export type BalanceHistoryQueryVariables = Exact<{
+  walletId: string | number;
+}>;
+
+
+export type BalanceHistoryQuery = { balanceHistory: Array<{ date: string, balance: number }> };
+
+export type SpendingByCategoryQueryVariables = Exact<{
+  walletId: string | number;
+  startDate: string;
+  endDate: string;
+}>;
+
+
+export type SpendingByCategoryQuery = { spendingByCategory: Array<{ category: string, amount: number }> };
+
 export type TransactionsQueryVariables = Exact<{
   accountId?: string | number | null | undefined;
   first?: number | null | undefined;
@@ -63,7 +79,7 @@ export type TransferFundsMutation = { transferFunds: { success: boolean, transac
 export type WalletsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WalletsQuery = { wallets: Array<{ id: string, label: string, accounts: Array<{ id: string, name: string, balance: number }> }> };
+export type WalletsQuery = { wallets: Array<{ id: string, label: string, accounts: Array<{ id: string, name: string, type: AccountType, balance: number, currency: string, lastUpdated: string }> }> };
 
 export type CreateWalletMutationVariables = Exact<{
   label: string;
@@ -107,6 +123,70 @@ useAccountsQuery.getKey = (variables: AccountsQueryVariables) => ['Accounts', va
 
 
 useAccountsQuery.fetcher = (variables: AccountsQueryVariables) => fetcher<AccountsQuery, AccountsQueryVariables>(AccountsDocument, variables);
+
+export const BalanceHistoryDocument = new TypedDocumentString(`
+    query BalanceHistory($walletId: ID!) {
+  balanceHistory(walletId: $walletId) {
+    date
+    balance
+  }
+}
+    `);
+
+export const useBalanceHistoryQuery = <
+      TData = BalanceHistoryQuery,
+      TError = unknown
+    >(
+      variables: BalanceHistoryQueryVariables,
+      options?: Omit<UseQueryOptions<BalanceHistoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<BalanceHistoryQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<BalanceHistoryQuery, TError, TData>(
+      {
+    queryKey: ['BalanceHistory', variables],
+    queryFn: fetcher<BalanceHistoryQuery, BalanceHistoryQueryVariables>(BalanceHistoryDocument, variables),
+    ...options
+  }
+    )};
+
+useBalanceHistoryQuery.getKey = (variables: BalanceHistoryQueryVariables) => ['BalanceHistory', variables];
+
+
+useBalanceHistoryQuery.fetcher = (variables: BalanceHistoryQueryVariables) => fetcher<BalanceHistoryQuery, BalanceHistoryQueryVariables>(BalanceHistoryDocument, variables);
+
+export const SpendingByCategoryDocument = new TypedDocumentString(`
+    query SpendingByCategory($walletId: ID!, $startDate: String!, $endDate: String!) {
+  spendingByCategory(
+    walletId: $walletId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    category
+    amount
+  }
+}
+    `);
+
+export const useSpendingByCategoryQuery = <
+      TData = SpendingByCategoryQuery,
+      TError = unknown
+    >(
+      variables: SpendingByCategoryQueryVariables,
+      options?: Omit<UseQueryOptions<SpendingByCategoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SpendingByCategoryQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<SpendingByCategoryQuery, TError, TData>(
+      {
+    queryKey: ['SpendingByCategory', variables],
+    queryFn: fetcher<SpendingByCategoryQuery, SpendingByCategoryQueryVariables>(SpendingByCategoryDocument, variables),
+    ...options
+  }
+    )};
+
+useSpendingByCategoryQuery.getKey = (variables: SpendingByCategoryQueryVariables) => ['SpendingByCategory', variables];
+
+
+useSpendingByCategoryQuery.fetcher = (variables: SpendingByCategoryQueryVariables) => fetcher<SpendingByCategoryQuery, SpendingByCategoryQueryVariables>(SpendingByCategoryDocument, variables);
 
 export const TransactionsDocument = new TypedDocumentString(`
     query Transactions($accountId: ID, $first: Int, $after: String) {
@@ -196,7 +276,10 @@ export const WalletsDocument = new TypedDocumentString(`
     accounts {
       id
       name
+      type
       balance
+      currency
+      lastUpdated
     }
   }
 }

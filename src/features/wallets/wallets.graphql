@@ -5,7 +5,10 @@ query Wallets {
     accounts {
       id
       name
+      type
       balance
+      currency
+      lastUpdated
     }
   }
 }
