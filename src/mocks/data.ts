@@ -5,6 +5,8 @@
 // Balances, transaction history, charts, and analytics are all
 // computed from this append-only array of entries.
 
+import { getUsers } from './auth';
+
 export interface LedgerEntry {
   id: string;
   amount: number;
@@ -26,6 +28,7 @@ export interface AccountDef {
 
 export interface WalletDef {
   id: string;
+  userId: string;
   label: string;
   accounts: AccountDef[];
 }
@@ -34,6 +37,7 @@ export interface WalletDef {
 export const wallets: WalletDef[] = [
   {
     id: 'w1',
+    userId: 'u1',
     label: 'Personal Wallet',
     accounts: [
       { id: 'a1', name: 'Main Checking', type: 'CHECKING', currency: 'USD' },
@@ -41,6 +45,100 @@ export const wallets: WalletDef[] = [
     ],
   },
 ];
+
+// export interface WalletDef { id: string; userId: string; label: string; accounts: AccountDef[]; }
+
+const walletsByUser = new Map<string, WalletDef[]>();
+
+export function createDefaultWalletForUser(userId: string): WalletDef {
+  const walletId = crypto.randomUUID();
+  const checkingId = crypto.randomUUID();
+  const savingsId = crypto.randomUUID();
+  const wallet: WalletDef = {
+    id: walletId,
+    userId,
+    label: 'Personal Wallet',
+    accounts: [
+      { id: checkingId, name: 'Main Checking', type: 'CHECKING', currency: 'USD' },
+      { id: savingsId, name: 'Savings', type: 'SAVINGS', currency: 'USD' },
+    ],
+  };
+  // Add initial deposit transaction
+  ledger.unshift({
+    id: crypto.randomUUID(),
+    amount: 10000,
+    currency: 'USD',
+    type: 'DEPOSIT',
+    description: 'Initial deposit',
+    createdAt: new Date().toISOString(),
+    sourceAccountId: null,
+    destinationAccountId: checkingId,
+    category: 'Income',
+  });
+  return wallet;
+}
+
+// Load/save from sessionStorage for persistence
+const STORAGE_KEY = 'stratos_wallet_state';
+
+export async function loadState() {
+  const saved = sessionStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    const data = JSON.parse(saved);
+    // Restore walletsByUser
+    walletsByUser.clear();
+    for (const [userId, wallets] of Object.entries(data.walletsByUser)) {
+      walletsByUser.set(userId, wallets as WalletDef[]);
+    }
+    // Restore ledger
+    ledger.length = 0;
+    ledger.push(...data.ledger as LedgerEntry[]);
+    // Restore users
+    const { loadUsers } = await import('./auth');
+    loadUsers(data.users || []);
+  } else {
+    // Seed default admin user
+    const { registerUser } = await import('./auth');
+    registerUser('admin@stratos.com', 'admin123', 'admin');
+  }
+}
+
+export async function saveState() {
+  const state = {
+    walletsByUser: Object.fromEntries(walletsByUser),
+    ledger,
+    users: getUsers(),
+  };
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Functions to get wallets/accounts for a user
+export function getWalletsForUser(userId: string): WalletDef[] {
+  return walletsByUser.get(userId) || [];
+}
+
+export function getAllAccountsForUser(userId: string): AccountDef[] {
+  const wallets = getWalletsForUser(userId);
+  return wallets.flatMap(w => w.accounts);
+}
+
+export function getWalletById(walletId: string): WalletDef | undefined {
+  for (const wallets of walletsByUser.values()) {
+    const found = wallets.find(w => w.id === walletId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+export function getAccountById(accountId: string): AccountDef | undefined {
+  for (const wallets of walletsByUser.values()) {
+    for (const w of wallets) {
+      const found = w.accounts.find(a => a.id === accountId);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
 
 // -- Helpers --
 const categories = [

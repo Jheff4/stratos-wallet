@@ -1,4 +1,4 @@
-import { graphql, HttpResponse } from 'msw'
+import { graphql, HttpResponse, http } from 'msw'
 import {
   ledger,
   wallets,
@@ -8,9 +8,31 @@ import {
   type LedgerEntry,
 } from './data'
 
+import { registerUser, authenticateUser, createToken, parseToken, getUsers, findUserById, findUserByEmail } from './auth';
+
 const idempotencyStore = new Map<string, any>()
 
 export const handlers = [
+  // Auth endpoints
+  http.post('/auth/register', async ({ request }) => {
+    const { email, password, role } = await request.json() as any;
+    if (!email || !password) return new HttpResponse(null, { status: 400 });
+    if (findUserByEmail(email)) {
+      return HttpResponse.json({ error: 'User already exists' }, { status: 409 });
+    }
+    const user = registerUser(email, password, role || 'user');
+    const token = createToken(user);
+    return HttpResponse.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  }),
+
+  http.post('/auth/login', async ({ request }) => {
+    const { email, password } = await request.json() as any;
+    const user = authenticateUser(email, password);
+    if (!user) return HttpResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    const token = createToken(user);
+    return HttpResponse.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  }),
+
   // ======================================================
   // QUERY: Wallets
   // ======================================================
@@ -145,6 +167,7 @@ export const handlers = [
 
     const newWallet = {
       id: `w${Date.now()}`,
+      userId: 'u1',
       label,
       accounts: [],
     }
