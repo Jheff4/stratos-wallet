@@ -10,6 +10,7 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, 'src/shared'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@graphql': path.resolve(__dirname, 'src/graphql'),
+      '@chaos': path.resolve(__dirname, 'src/chaos'),
     },
   },
   test: {

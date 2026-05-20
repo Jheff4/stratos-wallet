@@ -4,7 +4,8 @@
       "@features/*": ["./src/features/*"],
       "@shared/*": ["./src/shared/*"],
       "@config/*": ["./src/config/*"],
-      "@graphql/*": ["./src/graphql/*"]
+      "@graphql/*": ["./src/graphql/*"],
+      "@chaos/*": ["./src/chaos/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "es2023",

@@ -8,7 +8,7 @@ export interface User {
 
 // In-memory storage (will be persisted later)
 let users: User[] = [];
-let tokens: Map<string, string> = new Map(); // token -> userId
+// let tokens: Map<string, string> = new Map(); // token -> userId
 
 // Simple token: base64(JSON({userId, role}))
 export function createToken(user: User): string {

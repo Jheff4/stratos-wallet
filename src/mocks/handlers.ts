@@ -8,11 +8,18 @@ import {
   type LedgerEntry,
 } from './data'
 
-import { registerUser, authenticateUser, createToken, parseToken, getUsers, findUserById, findUserByEmail } from './auth';
+import { registerUser, authenticateUser, createToken, findUserByEmail } from './auth';
+import { applyChaos, updateChaosConfig } from './chaos';
 
 const idempotencyStore = new Map<string, any>()
 
 export const handlers = [
+  http.post('/chaos/config', async ({ request }) => {
+    const body = await request.json() as any;
+    updateChaosConfig(body);
+    return HttpResponse.json({ success: true });
+  }),
+
   // Auth endpoints
   http.post('/auth/register', async ({ request }) => {
     const { email, password, role } = await request.json() as any;
@@ -36,7 +43,8 @@ export const handlers = [
   // ======================================================
   // QUERY: Wallets
   // ======================================================
-  graphql.query('Wallets', () => {
+  graphql.query('Wallets', async () => {
+    await applyChaos();
     const result = wallets.map((wallet) => ({
       id: wallet.id,
       label: wallet.label,
@@ -58,7 +66,8 @@ export const handlers = [
   // ======================================================
   // QUERY: Accounts
   // ======================================================
-  graphql.query('Accounts', ({ variables }) => {
+  graphql.query('Accounts', async ({ variables }) => {
+    await applyChaos();
     const { walletId } = variables as { walletId: string }
 
     const wallet = wallets.find((w) => w.id === walletId)
@@ -83,7 +92,8 @@ export const handlers = [
   // ======================================================
   // QUERY: Transactions (cursor pagination)
   // ======================================================
-  graphql.query('Transactions', ({ variables }) => {
+  graphql.query('Transactions', async ({ variables }) => {
+    await applyChaos();
     const { accountId, first = 10, after } = variables as {
       accountId?: string
       first?: number
@@ -128,7 +138,8 @@ export const handlers = [
   // ======================================================
   // QUERY: Balance History
   // ======================================================
-  graphql.query('BalanceHistory', ({ variables }) => {
+  graphql.query('BalanceHistory', async ({ variables }) => {
+    await applyChaos();
     const { walletId } = variables as { walletId: string }
 
     return HttpResponse.json({
@@ -141,7 +152,8 @@ export const handlers = [
   // ======================================================
   // QUERY: Spending By Category
   // ======================================================
-  graphql.query('SpendingByCategory', ({ variables }) => {
+  graphql.query('SpendingByCategory', async ({ variables }) => {
+    await applyChaos();
     const { walletId, startDate, endDate } = variables as {
       walletId: string
       startDate: string
@@ -162,7 +174,8 @@ export const handlers = [
   // ======================================================
   // MUTATION: Create Wallet
   // ======================================================
-  graphql.mutation('CreateWallet', ({ variables }) => {
+  graphql.mutation('CreateWallet', async ({ variables }) => {
+    await applyChaos();
     const { label } = variables as { label: string }
 
     const newWallet = {
@@ -184,7 +197,8 @@ export const handlers = [
   // ======================================================
   // MUTATION: Transfer Funds
   // ======================================================
-  graphql.mutation('TransferFunds', ({ variables }) => {
+  graphql.mutation('TransferFunds', async ({ variables }) => {
+    await applyChaos();
     const {
       fromAccountId,
       toAccountId,
