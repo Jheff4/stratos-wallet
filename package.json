@@ -19,6 +19,7 @@
     "react-dom": "^19.2.6",
     "react-error-boundary": "^6.1.1",
     "react-intersection-observer": "^10.0.3",
+    "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^7.15.0",
     "recharts": "^3.8.1",
     "zustand": "^5.0.13"

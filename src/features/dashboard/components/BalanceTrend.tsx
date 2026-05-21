@@ -1,10 +1,11 @@
 import { useBalanceHistoryQuery } from '@graphql/generated';
+import WidgetSkeleton from '@shared/components/WidgetSkeleton';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function BalanceTrend({ walletId }: { walletId: string }) {
   const { data, isLoading } = useBalanceHistoryQuery({ walletId });
 
-  if (isLoading) return <div>Loading chart...</div>;
+  if (isLoading) return <WidgetSkeleton />;
 
   const chartData = data?.balanceHistory?.map((snap) => ({
     date: snap.date,
