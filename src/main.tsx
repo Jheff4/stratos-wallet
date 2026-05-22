@@ -22,7 +22,7 @@ enableMocking().then(() => {
         <QueryClientProvider client={queryClient}>
           <App />
           <ChaosPanel />
-          <ReactQueryDevtools initialIsOpen={false} />
+          {window.location.search.includes('chaos=true') && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
       </ChaosProvider>
     </React.StrictMode>,

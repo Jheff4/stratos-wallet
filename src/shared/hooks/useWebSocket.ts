@@ -48,32 +48,39 @@ export function useWebSocket(
       try {
         const data = JSON.parse(event.data);
 
-        // -------------------------------------------------
-        // Chaos Simulation: Random Message Drop
-        // -------------------------------------------------
-
-        if (Math.random() < config.messageDropRate) {
-          console.warn('[WS] Message dropped');
-
+        // drop messages
+        if (
+          config.messageDropRate > 0 &&
+          Math.random() < config.messageDropRate
+        ) {
           return;
         }
 
-        // -------------------------------------------------
-        // Chaos Simulation: Duplicate Events
-        // -------------------------------------------------
-
+        // duplicate messages
         if (
           config.duplicateWsEvents &&
           Math.random() < 0.5
         ) {
           setTimeout(() => {
             onMessageRef.current(data);
-          }, 100);
+          }, 150);
+        }
+
+        // reorder messages
+        if (
+          config.messageReorderRate > 0 &&
+          Math.random() < config.messageReorderRate
+        ) {
+          setTimeout(() => {
+            onMessageRef.current(data);
+          }, 1000);
+
+          return;
         }
 
         onMessageRef.current(data);
-      } catch (error) {
-        console.error('[WS] Invalid message', error);
+      } catch (e) {
+        console.error('[WS] Invalid message', e);
       }
     };
 

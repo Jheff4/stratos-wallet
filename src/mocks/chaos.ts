@@ -1,3 +1,5 @@
+// import { delay } from "msw";
+
 // Default chaos configuration
 export interface ChaosConfig {
   latencyMin: number;   // ms
@@ -33,6 +35,9 @@ export function updateChaosConfig(newConfig: Partial<ChaosConfig>) {
 export async function applyChaos() {
   const { latencyMin, latencyMax, errorRate, messageDropRate, messageReorderRate, partialResponseRate } = config;
 
+  console.log('[CHAOS]', config);
+
+
   // Random latency
   if (latencyMax > 0) {
     const delay = latencyMin + Math.random() * (latencyMax - latencyMin);
@@ -48,6 +53,8 @@ export async function applyChaos() {
   if (Math.random() < messageDropRate) {
     return null;
   }
+
+  console.log('[CHAOS] throwing error');
   
   // Message reorder
   if (Math.random() < messageReorderRate) {
@@ -58,6 +65,8 @@ export async function applyChaos() {
   if (Math.random() < partialResponseRate) {
     return 'partial';
   }
+
+  console.log('[CHAOS] no chaos');
   
   // No chaos
   return 'ok';

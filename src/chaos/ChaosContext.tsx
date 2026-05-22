@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useEffect,
 } from 'react';
+import { queryClient } from '../queryClient';
 
 export interface ChaosState {
   latencyMin: number;
@@ -329,6 +330,7 @@ async function syncChaosConfig(config: ChaosState) {
     },
     body: JSON.stringify(config),
   });
+  queryClient.invalidateQueries();
 }
 
 export function ChaosProvider({
