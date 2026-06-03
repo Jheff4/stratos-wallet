@@ -1,11 +1,15 @@
 import { graphql, HttpResponse, http } from 'msw'
 import {
   ledger,
-  wallets,
+  getAllWallets,
+  getWalletById,
+  getAccountById,
+  addWallet,
   computeBalance,
   computeBalanceHistory,
   computeSpendingByCategory,
   type LedgerEntry,
+  type WalletDef,
 } from './data'
 
 import { registerUser, authenticateUser, createToken, findUserByEmail } from './auth';
@@ -45,7 +49,7 @@ export const handlers = [
   // ======================================================
   graphql.query('Wallets', async () => {
     await applyChaos();
-    const result = wallets.map((wallet) => ({
+    const result = getAllWallets().map((wallet) => ({
       id: wallet.id,
       label: wallet.label,
       accounts: wallet.accounts.map((acc) => ({
@@ -70,7 +74,7 @@ export const handlers = [
     await applyChaos();
     const { walletId } = variables as { walletId: string }
 
-    const wallet = wallets.find((w) => w.id === walletId)
+    const wallet = getWalletById(walletId)
     if (!wallet) {
       return HttpResponse.json({ data: { accounts: [] } })
     }
@@ -178,14 +182,17 @@ export const handlers = [
     await applyChaos();
     const { label } = variables as { label: string }
 
-    const newWallet = {
+    const newWallet: WalletDef = {
       id: `w${Date.now()}`,
       userId: 'u1',
       label,
       accounts: [],
     }
 
-    wallets.push(newWallet)
+    // Write through the single wallet registry.
+    // addWallet() updates walletsByUser, so every subsequent read
+    // — wallets query, balance history, spending chart — will find it.
+    addWallet('u1', newWallet)
 
     return HttpResponse.json({
       data: {
@@ -219,13 +226,8 @@ export const handlers = [
       })
     }
 
-    const fromAccount = wallets
-      .flatMap((w) => w.accounts)
-      .find((a) => a.id === fromAccountId)
-
-    const toAccount = wallets
-      .flatMap((w) => w.accounts)
-      .find((a) => a.id === toAccountId)
+    const fromAccount = getAccountById(fromAccountId)
+    const toAccount   = getAccountById(toAccountId)
 
     if (!fromAccount || !toAccount) {
       const res = { success: false, transaction: null }

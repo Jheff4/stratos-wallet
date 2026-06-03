@@ -1,30 +1,853 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+/* ============================================================
+   Stratos Wallet — Design System
+   ============================================================
 
-/* You can override the default Infima variables here. */
+   ARCHITECTURE: CSS custom properties as design tokens.
+
+   Every colour, spacing, and typography decision is named here
+   and referenced everywhere else. To retheme the entire site,
+   change tokens in this file — nothing else needs to change.
+
+   Token naming:   --stratos-{category}-{variant}
+   Infima mapping: --ifm-{property}: var(--stratos-...)
+
+   Keeping Stratos tokens separate from Infima variables means
+   a Docusaurus version upgrade can never silently overwrite our
+   design decisions.
+   ============================================================ */
+
+/* ============================================================
+   FONT IMPORTS
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================
+   STRATOS DESIGN TOKENS — LIGHT MODE
+   ============================================================ */
+
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* ---- Brand (cobalt-periwinkle) ---- */
+  --stratos-brand-50:   #eef1fe;
+  --stratos-brand-100:  #d5dcfc;
+  --stratos-brand-200:  #abb9f9;
+  --stratos-brand-300:  #7b96ff;
+  --stratos-brand-400:  #5b7cf6;
+  --stratos-brand-500:  #4a6cf7;   /* base brand */
+  --stratos-brand-600:  #3a59e0;
+  --stratos-brand-700:  #2d46c0;
+  --stratos-brand-800:  #23389a;
+  --stratos-brand-900:  #1a2970;
+
+  /* ---- Ink (text & UI chrome) ---- */
+  --stratos-ink-50:   #f5f7ff;
+  --stratos-ink-100:  #eaedf8;
+  --stratos-ink-200:  #d0d6eb;
+  --stratos-ink-300:  #a8b3cc;
+  --stratos-ink-400:  #7b8fb0;
+  --stratos-ink-500:  #556080;
+  --stratos-ink-600:  #3d4a63;
+  --stratos-ink-700:  #2a3348;
+  --stratos-ink-800:  #1a2132;
+  --stratos-ink-900:  #0f1523;
+
+  /* ---- Surface ---- */
+  --stratos-surface-0:   #ffffff;
+  --stratos-surface-50:  #fafbff;
+  --stratos-surface-100: #f0f2fc;
+  --stratos-surface-200: #e4e8f7;
+
+  /* ---- Amber (financial emphasis) ---- */
+  --stratos-amber-300: #fcd48a;
+  --stratos-amber-400: #f5b942;
+  --stratos-amber-500: #e8a045;
+  --stratos-amber-600: #c97c1a;
+
+  /* ---- Teal (success) ---- */
+  --stratos-teal-300:  #67e8f9;
+  --stratos-teal-400:  #22d3ee;
+  --stratos-teal-500:  #06b6d4;
+  --stratos-teal-600:  #0891b2;
+
+  /* ---- Rose (danger) ---- */
+  --stratos-rose-400:  #fb7185;
+  --stratos-rose-500:  #f43f5e;
+  --stratos-rose-600:  #e11d48;
+
+  /* ---- Borders ---- */
+  --stratos-border-light:  #e2e7f5;
+  --stratos-border-medium: #c9d1e8;
+
+  /* ---- Shadows ---- */
+  --stratos-shadow-sm: 0 1px 3px rgba(15,21,35,0.08), 0 1px 2px rgba(15,21,35,0.04);
+  --stratos-shadow-md: 0 4px 12px rgba(15,21,35,0.10), 0 2px 4px rgba(15,21,35,0.06);
+  --stratos-shadow-lg: 0 12px 32px rgba(15,21,35,0.12), 0 4px 8px rgba(15,21,35,0.06);
+
+  /* ---- Typography ---- */
+  --stratos-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --stratos-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* ---- Radius ---- */
+  --stratos-radius-sm:   4px;
+  --stratos-radius-md:   8px;
+  --stratos-radius-lg:  12px;
+  --stratos-radius-pill: 999px;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* ============================================================
+   INFIMA OVERRIDES — LIGHT MODE
+   ============================================================ */
+
+:root {
+  --ifm-color-primary:          var(--stratos-brand-500);
+  --ifm-color-primary-dark:     var(--stratos-brand-600);
+  --ifm-color-primary-darker:   var(--stratos-brand-700);
+  --ifm-color-primary-darkest:  var(--stratos-brand-800);
+  --ifm-color-primary-light:    var(--stratos-brand-400);
+  --ifm-color-primary-lighter:  var(--stratos-brand-300);
+  --ifm-color-primary-lightest: var(--stratos-brand-200);
+
+  --ifm-background-color:         var(--stratos-surface-0);
+  --ifm-background-surface-color: var(--stratos-surface-50);
+  --ifm-navbar-background-color:  var(--stratos-surface-0);
+
+  --ifm-font-family-base:       var(--stratos-font-sans);
+  --ifm-heading-font-family:    var(--stratos-font-sans);
+  --ifm-font-family-monospace:  var(--stratos-font-mono);
+  --ifm-font-size-base:         15px;
+  --ifm-line-height-base:       1.75;
+  --ifm-font-color-base:        var(--stratos-ink-900);
+
+  --ifm-hr-border-color:          var(--stratos-border-light);
+  --ifm-table-border-color:       var(--stratos-border-light);
+  --ifm-toc-border-color:         var(--stratos-border-light);
+  --ifm-code-font-size:           88%;
+  --ifm-code-background:          var(--stratos-surface-100);
+  --ifm-pre-background:           var(--stratos-ink-900);
+  --ifm-navbar-height:            58px;
+  --ifm-navbar-shadow:            0 1px 0 var(--stratos-border-light);
+  --ifm-sidebar-width:            268px;
+  --ifm-link-color:               var(--stratos-brand-500);
+  --ifm-link-hover-color:         var(--stratos-brand-600);
+  --docusaurus-highlighted-code-line-bg: rgba(74,108,247,0.10);
+}
+
+/* ============================================================
+   STRATOS DESIGN TOKENS — DARK MODE
+   ============================================================ */
+
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --stratos-surface-0:   #0d1117;
+  --stratos-surface-50:  #141b2d;
+  --stratos-surface-100: #1c2540;
+  --stratos-surface-200: #243050;
+
+  --stratos-border-light:  #1e2a42;
+  --stratos-border-medium: #2a3a58;
+
+  --stratos-shadow-sm: 0 1px 3px rgba(0,0,0,0.40);
+  --stratos-shadow-md: 0 4px 12px rgba(0,0,0,0.50);
+  --stratos-shadow-lg: 0 12px 32px rgba(0,0,0,0.60);
+}
+
+/* ============================================================
+   INFIMA OVERRIDES — DARK MODE
+   ============================================================ */
+
+[data-theme='dark'] {
+  --ifm-color-primary:          var(--stratos-brand-300);
+  --ifm-color-primary-dark:     var(--stratos-brand-400);
+  --ifm-color-primary-darker:   var(--stratos-brand-500);
+  --ifm-color-primary-darkest:  var(--stratos-brand-600);
+  --ifm-color-primary-light:    var(--stratos-brand-200);
+  --ifm-color-primary-lighter:  var(--stratos-brand-100);
+  --ifm-color-primary-lightest: var(--stratos-brand-50);
+
+  --ifm-background-color:         var(--stratos-surface-0);
+  --ifm-background-surface-color: var(--stratos-surface-50);
+  --ifm-navbar-background-color:  var(--stratos-surface-0);
+  --ifm-font-color-base:          #edf1fa;
+  --ifm-hr-border-color:          var(--stratos-border-light);
+  --ifm-table-border-color:       var(--stratos-border-light);
+  --ifm-toc-border-color:         var(--stratos-border-light);
+  --ifm-code-background:          var(--stratos-surface-100);
+  --ifm-pre-background:           #0a0f1a;
+  --ifm-navbar-shadow:            0 1px 0 var(--stratos-border-light);
+  --docusaurus-highlighted-code-line-bg: rgba(123,150,255,0.12);
+}
+
+/* ============================================================
+   GLOBAL BASE
+   ============================================================ */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+
+.navbar {
+  backdrop-filter: saturate(180%) blur(8px);
+  -webkit-backdrop-filter: saturate(180%) blur(8px);
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(13,17,23,0.85);
+}
+
+.navbar__title {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.navbar__item {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.menu__link {
+  font-size: 13.5px;
+  border-radius: var(--stratos-radius-md);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menu__link--active,
+.menu__link:hover {
+  background: color-mix(in srgb, var(--stratos-brand-500) 10%, transparent);
+  color: var(--stratos-brand-500);
+}
+
+[data-theme='dark'] .menu__link--active,
+[data-theme='dark'] .menu__link:hover {
+  background: color-mix(in srgb, var(--stratos-brand-300) 12%, transparent);
+  color: var(--stratos-brand-300);
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+/* ============================================================
+   CONTENT TYPOGRAPHY
+   ============================================================ */
+
+.markdown h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+
+.markdown h2 {
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--stratos-border-light);
+}
+
+.markdown h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-top: 2rem;
+}
+
+.markdown p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* ============================================================
+   CODE BLOCKS
+   ============================================================ */
+
+code {
+  font-family: var(--stratos-font-mono);
+  padding: 0.15em 0.45em;
+  border-radius: var(--stratos-radius-sm);
+  border: 1px solid var(--stratos-border-light);
+}
+
+[data-theme='dark'] code {
+  color: var(--stratos-brand-300);
+  border-color: var(--stratos-border-light);
+}
+
+.prism-code {
+  font-family: var(--stratos-font-mono);
+  font-size: 13.5px;
+  line-height: 1.65;
+  border-radius: var(--stratos-radius-lg);
+  border: 1px solid var(--stratos-border-light);
+}
+
+[data-theme='dark'] .prism-code {
+  border-color: var(--stratos-border-medium);
+}
+
+/* ============================================================
+   TABLES — full-width, always
+   ============================================================ */
+
+/* Force tables to fill their container at every viewport width.
+   Docusaurus wraps markdown content in a max-width article;
+   we want the table to use that full width, not shrink to content. */
+.markdown table {
+  display: table;          /* override any block/inline-block that clips width */
+  width: 100% !important;
+  min-width: 100%;
+  table-layout: auto;
+  font-size: 14px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--stratos-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--stratos-border-light);
+  box-shadow: var(--stratos-shadow-sm);
+  margin: 1.25rem 0;
+}
+
+/* Wrapper that Docusaurus sometimes injects around tables */
+.markdown .table-wrapper,
+.markdown table + *,
+div[class*='tableWrapper'] {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.markdown th {
+  background: var(--stratos-surface-100);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stratos-ink-500);
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--stratos-border-light);
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .markdown th {
+  background: var(--stratos-surface-100);
+  color: var(--stratos-ink-300);
+}
+
+.markdown td {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--stratos-border-light);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.markdown tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown tr:hover td {
+  background: color-mix(in srgb, var(--stratos-brand-500) 4%, transparent);
+}
+
+/* First column of tables — slightly bolder for label columns */
+.markdown td:first-child {
+  font-weight: 500;
+  color: var(--stratos-ink-800);
+}
+
+[data-theme='dark'] .markdown td:first-child {
+  color: #dce4f5;
+}
+
+/* ============================================================
+   ADMONITIONS
+   Note → info (blue) | Caution → warning (amber) | Danger → rose
+   Per technical writing course: colour signals severity
+   ============================================================ */
+
+.alert {
+  border-radius: var(--stratos-radius-lg);
+  border-left-width: 4px;
+  border-left-style: solid;
+  font-size: 14px;
+  box-shadow: var(--stratos-shadow-sm);
+}
+
+.alert--info {
+  background: color-mix(in srgb, var(--stratos-brand-500) 6%, var(--stratos-surface-0));
+  border-left-color: var(--stratos-brand-500);
+}
+
+[data-theme='dark'] .alert--info {
+  background: color-mix(in srgb, var(--stratos-brand-500) 10%, var(--stratos-surface-50));
+}
+
+.alert--warning {
+  background: color-mix(in srgb, var(--stratos-amber-500) 8%, var(--stratos-surface-0));
+  border-left-color: var(--stratos-amber-500);
+}
+
+[data-theme='dark'] .alert--warning {
+  background: color-mix(in srgb, var(--stratos-amber-500) 10%, var(--stratos-surface-50));
+}
+
+.alert--danger {
+  background: color-mix(in srgb, var(--stratos-rose-500) 6%, var(--stratos-surface-0));
+  border-left-color: var(--stratos-rose-500);
+}
+
+[data-theme='dark'] .alert--danger {
+  background: color-mix(in srgb, var(--stratos-rose-500) 10%, var(--stratos-surface-50));
+}
+
+/* ============================================================
+   TABLE OF CONTENTS (right rail)
+   ============================================================ */
+
+.table-of-contents__link {
+  font-size: 13px;
+  color: var(--stratos-ink-400);
+  transition: color 0.15s ease;
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link:hover {
+  color: var(--stratos-brand-500);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .table-of-contents__link--active,
+[data-theme='dark'] .table-of-contents__link:hover {
+  color: var(--stratos-brand-300);
+}
+
+/* ============================================================
+   MERMAID DIAGRAMS
+   ============================================================ */
+
+.docusaurus-mermaid-container {
+  background: var(--stratos-surface-50);
+  border: 1px solid var(--stratos-border-light);
+  border-radius: var(--stratos-radius-lg);
+  padding: 24px;
+  margin: 1.5rem 0;
+  box-shadow: var(--stratos-shadow-sm);
+  overflow-x: auto;
+}
+
+[data-theme='dark'] .docusaurus-mermaid-container {
+  background: var(--stratos-surface-50);
+  border-color: var(--stratos-border-medium);
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.pagination-nav__link {
+  border: 1px solid var(--stratos-border-light);
+  border-radius: var(--stratos-radius-lg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--stratos-brand-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--stratos-brand-500) 15%, transparent);
+}
+
+.pagination-nav__sublabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--stratos-ink-400);
+}
+
+.pagination-nav__label {
+  font-weight: 600;
+  color: var(--stratos-brand-500);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+  border-top: 1px solid var(--stratos-border-light);
+  background: var(--stratos-surface-50);
+  font-size: 13px;
+}
+
+[data-theme='dark'] .footer {
+  background: var(--stratos-surface-0);
+}
+
+/* ============================================================
+   STRATOS CUSTOM COMPONENT CLASSES
+   Use these in MDX for consistent cross-page styling
+   ============================================================ */
+
+/* Used in ADR rationale sections for engineering emphasis */
+.stratos-callout {
+  background: color-mix(in srgb, var(--stratos-brand-500) 6%, var(--stratos-surface-0));
+  border: 1px solid color-mix(in srgb, var(--stratos-brand-500) 20%, transparent);
+  border-left: 4px solid var(--stratos-brand-500);
+  border-radius: var(--stratos-radius-md);
+  padding: 16px 20px;
+  margin: 1.25rem 0;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+[data-theme='dark'] .stratos-callout {
+  background: color-mix(in srgb, var(--stratos-brand-500) 8%, var(--stratos-surface-50));
+  border-color: color-mix(in srgb, var(--stratos-brand-300) 25%, transparent);
+  border-left-color: var(--stratos-brand-300);
+}
+
+/* ADR status chip */
+.stratos-status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: var(--stratos-radius-pill);
+}
+
+.stratos-status--accepted {
+  background: color-mix(in srgb, var(--stratos-teal-500) 12%, transparent);
+  color: var(--stratos-teal-600);
+  border: 1px solid color-mix(in srgb, var(--stratos-teal-500) 30%, transparent);
+}
+
+[data-theme='dark'] .stratos-status--accepted {
+  color: var(--stratos-teal-400);
+  background: color-mix(in srgb, var(--stratos-teal-500) 14%, transparent);
+  border-color: color-mix(in srgb, var(--stratos-teal-400) 25%, transparent);
+}
+
+.stratos-status--draft {
+  background: color-mix(in srgb, var(--stratos-ink-400) 10%, transparent);
+  color: var(--stratos-ink-500);
+  border: 1px solid color-mix(in srgb, var(--stratos-ink-400) 25%, transparent);
+}
+
+/* ============================================================
+   ENGINEERING STORIES SECTION
+   Slightly warmer, more narrative typography to signal
+   "this is a story, not a spec"
+   ============================================================ */
+
+/* Pull quote — for the one-line concept label at the top of each story */
+.markdown blockquote {
+  border-left: 3px solid var(--stratos-amber-500);
+  background: color-mix(in srgb, var(--stratos-amber-500) 5%, var(--stratos-surface-0));
+  border-radius: 0 var(--stratos-radius-md) var(--stratos-radius-md) 0;
+  padding: 12px 18px;
+  font-style: normal;
+  color: var(--stratos-ink-700);
+  font-size: 14px;
+}
+
+[data-theme='dark'] .markdown blockquote {
+  background: color-mix(in srgb, var(--stratos-amber-500) 7%, var(--stratos-surface-50));
+  border-left-color: var(--stratos-amber-400);
+  color: #c8d0e4;
+}
+
+/* Engineering principle callout — the bold takeaway at the end of every story */
+.stratos-principle {
+  background: color-mix(in srgb, var(--stratos-ink-900) 4%, var(--stratos-surface-0));
+  border: 1px solid var(--stratos-border-medium);
+  border-top: 3px solid var(--stratos-ink-700);
+  border-radius: var(--stratos-radius-md);
+  padding: 16px 20px;
+  margin: 2rem 0 1rem;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+[data-theme='dark'] .stratos-principle {
+  background: var(--stratos-surface-100);
+  border-color: var(--stratos-border-medium);
+  border-top-color: var(--stratos-ink-300);
+}
+
+/* Roadmap phase label */
+.stratos-phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--stratos-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--stratos-radius-pill);
+  background: color-mix(in srgb, var(--stratos-brand-500) 10%, transparent);
+  color: var(--stratos-brand-600);
+  border: 1px solid color-mix(in srgb, var(--stratos-brand-500) 25%, transparent);
+  letter-spacing: 0.04em;
+}
+
+[data-theme='dark'] .stratos-phase {
+  background: color-mix(in srgb, var(--stratos-brand-300) 12%, transparent);
+  color: var(--stratos-brand-300);
+  border-color: color-mix(in srgb, var(--stratos-brand-300) 25%, transparent);
+}
+
+/* ============================================================
+   DIAGRAMS
+   Better Mermaid containers and comparison layouts
+   ============================================================ */
+
+.docusaurus-mermaid-container {
+  background: var(--stratos-surface-50);
+  border: 1px solid var(--stratos-border-light);
+  border-radius: var(--stratos-radius-lg);
+  padding: 28px 24px;
+  margin: 1.75rem 0;
+  box-shadow: var(--stratos-shadow-sm);
+  overflow-x: auto;
+  text-align: center;
+}
+
+[data-theme='dark'] .docusaurus-mermaid-container {
+  background: var(--stratos-surface-50);
+  border-color: var(--stratos-border-medium);
+}
+
+/* Caption below a diagram */
+.diagram-caption {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--stratos-ink-400);
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* Two-column comparison layout used in ADR diagrams */
+.stratos-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .stratos-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stratos-compare-bad {
+  background: color-mix(in srgb, var(--stratos-rose-500) 5%, var(--stratos-surface-0));
+  border: 1px solid color-mix(in srgb, var(--stratos-rose-500) 20%, transparent);
+  border-top: 3px solid var(--stratos-rose-500);
+  border-radius: var(--stratos-radius-lg);
+  padding: 18px 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.stratos-compare-good {
+  background: color-mix(in srgb, var(--stratos-teal-500) 5%, var(--stratos-surface-0));
+  border: 1px solid color-mix(in srgb, var(--stratos-teal-500) 20%, transparent);
+  border-top: 3px solid var(--stratos-teal-500);
+  border-radius: var(--stratos-radius-lg);
+  padding: 18px 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .stratos-compare-bad {
+  background: color-mix(in srgb, var(--stratos-rose-500) 8%, var(--stratos-surface-50));
+  border-color: color-mix(in srgb, var(--stratos-rose-500) 22%, transparent);
+}
+
+[data-theme='dark'] .stratos-compare-good {
+  background: color-mix(in srgb, var(--stratos-teal-500) 8%, var(--stratos-surface-50));
+  border-color: color-mix(in srgb, var(--stratos-teal-500) 22%, transparent);
+}
+
+.stratos-compare-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.stratos-compare-bad .stratos-compare-label  { color: var(--stratos-rose-500);  }
+.stratos-compare-good .stratos-compare-label { color: var(--stratos-teal-600);  }
+
+[data-theme='dark'] .stratos-compare-good .stratos-compare-label { color: var(--stratos-teal-400); }
+
+/* ============================================================
+   INTERVIEW SECTION
+   ============================================================ */
+
+/* Q&A block — question + answer pair */
+.interview-q {
+  margin: 2rem 0 0;
+  padding: 14px 18px;
+  background: color-mix(in srgb, var(--stratos-brand-500) 6%, var(--stratos-surface-0));
+  border-left: 4px solid var(--stratos-brand-500);
+  border-radius: 0 var(--stratos-radius-md) var(--stratos-radius-md) 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--stratos-ink-900);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .interview-q {
+  background: color-mix(in srgb, var(--stratos-brand-500) 10%, var(--stratos-surface-50));
+  border-left-color: var(--stratos-brand-300);
+  color: #edf1fa;
+}
+
+.interview-q::before {
+  content: "Q  ";
+  font-family: var(--stratos-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--stratos-brand-500);
+  display: block;
+  margin-bottom: 4px;
+}
+
+[data-theme='dark'] .interview-q::before {
+  color: var(--stratos-brand-300);
+}
+
+.interview-a {
+  margin: 0 0 0.5rem;
+  padding: 16px 18px 16px 22px;
+  font-size: 14.5px;
+  line-height: 1.8;
+  border-left: 4px solid var(--stratos-border-medium);
+  color: var(--stratos-ink-700);
+}
+
+[data-theme='dark'] .interview-a {
+  border-left-color: var(--stratos-border-medium);
+  color: #b8c4dc;
+}
+
+/* Tip / lightbulb callout — used inline in any page */
+.tip {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--stratos-amber-500) 7%, var(--stratos-surface-0));
+  border: 1px solid color-mix(in srgb, var(--stratos-amber-500) 25%, transparent);
+  border-radius: var(--stratos-radius-lg);
+  padding: 14px 18px;
+  margin: 1.25rem 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+[data-theme='dark'] .tip {
+  background: color-mix(in srgb, var(--stratos-amber-500) 9%, var(--stratos-surface-50));
+  border-color: color-mix(in srgb, var(--stratos-amber-400) 25%, transparent);
+}
+
+.tip::before {
+  content: "💡";
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Difficulty chip for interview questions */
+.diff {
+  display: inline-block;
+  font-family: var(--stratos-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--stratos-radius-pill);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.diff--mid    { background: color-mix(in srgb, var(--stratos-teal-500)   12%, transparent); color: var(--stratos-teal-600);   border: 1px solid color-mix(in srgb, var(--stratos-teal-500)   30%, transparent); }
+.diff--senior { background: color-mix(in srgb, var(--stratos-brand-500)  12%, transparent); color: var(--stratos-brand-600);  border: 1px solid color-mix(in srgb, var(--stratos-brand-500)  30%, transparent); }
+.diff--staff  { background: color-mix(in srgb, var(--stratos-amber-500)  12%, transparent); color: var(--stratos-amber-600);  border: 1px solid color-mix(in srgb, var(--stratos-amber-500)  30%, transparent); }
+
+[data-theme='dark'] .diff--mid    { color: var(--stratos-teal-400);   }
+[data-theme='dark'] .diff--senior { color: var(--stratos-brand-300);  }
+[data-theme='dark'] .diff--staff  { color: var(--stratos-amber-400);  }
+
+/* Related links footer — bottom of ADRs and stories */
+.stratos-related {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--stratos-border-light);
+}
+
+.stratos-related h4 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--stratos-ink-400);
+  margin-bottom: 10px;
+}
+
+.stratos-related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stratos-related li {
+  margin: 0;
+}
+
+.stratos-related a {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--stratos-radius-pill);
+  border: 1px solid var(--stratos-border-medium);
+  color: var(--stratos-brand-500);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.stratos-related a:hover {
+  border-color: var(--stratos-brand-500);
+  background: color-mix(in srgb, var(--stratos-brand-500) 8%, transparent);
+  text-decoration: none;
+}
+
+[data-theme='dark'] .stratos-related a {
+  color: var(--stratos-brand-300);
+  border-color: var(--stratos-border-medium);
+}
+
+[data-theme='dark'] .stratos-related a:hover {
+  border-color: var(--stratos-brand-300);
+  background: color-mix(in srgb, var(--stratos-brand-300) 10%, transparent);
 }
