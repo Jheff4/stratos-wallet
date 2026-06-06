@@ -129,7 +129,7 @@ For financial mutations — transfers, payments, refunds, charges — idempotenc
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/004-idempotency-optimistic-updates">ADR 004 — Idempotency & Optimistic Updates</a></li>
+<li><a href="../adrs/idempotency-and-optimistic-updates">Idempotency & Optimistic Updates</a></li>
 <li><a href="../interview/system-design">Interview: How would you handle a transfer submitted twice?</a></li>
 </ul>
 </div>

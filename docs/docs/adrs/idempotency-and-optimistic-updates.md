@@ -1,7 +1,4 @@
-# 004: Idempotency and Optimistic Updates for Financial Mutations
-
-- **Date**: 2026-05-14
-- **Status**: accepted
+# Idempotency and Optimistic Updates for Financial Mutations
 
 ## Context
 
@@ -73,9 +70,9 @@ sequenceDiagram
 </div>
 
 <div class="stratos-related">
-<h4>Related ADRs</h4>
+<h4>Related decisions</h4>
 <ul>
-<li><a href="./008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
-<li><a href="./006-failure-system">ADR 006 — Failure Simulation & Resilience</a></li>
+<li><a href="./ledger-first-data-model">Ledger-First Data Model</a></li>
+<li><a href="./failure-simulation">Failure Simulation & Resilience</a></li>
 </ul>
 </div>

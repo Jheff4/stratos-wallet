@@ -160,8 +160,8 @@ Sequence numbers detect *gaps*, not duplicates. Two deliveries of event seq=42 b
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>
-<li><a href="../adrs/005-real-time-communication">ADR 005 — Real-Time Communication Strategy</a></li>
-<li><a href="../adrs/007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol</a></li>
+<li><a href="../adrs/real-time-communication">Real-Time Communication Strategy</a></li>
+<li><a href="../adrs/websocket-reliability-protocol">WebSocket Reliability Protocol</a></li>
 <li><a href="../stories/azeez-in-the-tunnel">Story: Azeez in the Tunnel</a></li>
 <li><a href="../stories/jons-duplicate-feed">Story: Jon's Duplicate Feed</a></li>
 <li><a href="../stories/the-reconnect-storm">Story: The Reconnect Storm</a></li>

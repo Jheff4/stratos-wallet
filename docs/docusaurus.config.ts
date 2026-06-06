@@ -1,5 +1,5 @@
 const config = {
-  title: 'Stratos Wallet Docs',
+  title: 'Stratos Wallet',
   tagline: 'Architecture & Engineering Guide',
 
   url: 'http://localhost:7700',
@@ -19,8 +19,7 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
-          editUrl:
-            'https://github.com/your-repo/tree/main/docs/',
+          breadcrumbs: false,
         },
 
         blog: false,
@@ -31,6 +30,18 @@ const config = {
       },
     ],
   ],
+
+  themeConfig: {
+    navbar: {
+      title: 'Stratos Wallet',
+      logo: {
+        alt: 'Stratos Wallet',
+        src: 'img/stratos-mark.svg',
+        srcDark: 'img/stratos-mark.svg',
+      },
+      items: [],
+    },
+  },
 
   markdown: {
     format: 'detect',

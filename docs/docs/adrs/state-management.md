@@ -1,7 +1,4 @@
-# 002: State Management Strategy
-
-- **Date**: 2026-05-11
-- **Status**: accepted
+# State Management Strategy
 
 ## Context
 

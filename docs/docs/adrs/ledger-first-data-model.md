@@ -1,6 +1,4 @@
-# ADR 008 — Ledger-First Data Model
-
-<span class="stratos-status stratos-status--accepted">Accepted</span> · 2026-06-01
+# Ledger-First Data Model
 
 ---
 
@@ -224,9 +222,9 @@ The answer: "Derive the balance from the transaction log rather than storing it.
 </div>
 
 <div class="stratos-related">
-<h4>Related ADRs</h4>
+<h4>Related decisions</h4>
 <ul>
-<li><a href="./007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol</a></li>
-<li><a href="./004-idempotency-optimistic-updates">ADR 004 — Idempotency & Optimistic Updates</a></li>
+<li><a href="./websocket-reliability-protocol">WebSocket Reliability Protocol</a></li>
+<li><a href="./idempotency-and-optimistic-updates">Idempotency & Optimistic Updates</a></li>
 </ul>
 </div>

@@ -109,7 +109,7 @@ Exponential backoff with jitter is the standard solution, used by every major cl
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol</a></li>
+<li><a href="../adrs/websocket-reliability-protocol">WebSocket Reliability Protocol</a></li>
 <li><a href="../interview/real-time">Interview: How does exponential backoff prevent reconnect storms?</a></li>
 </ul>
 </div>

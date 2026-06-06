@@ -30,4 +30,4 @@ New transactions are pushed via WebSocket (`ws://localhost:8080`). The `useTrans
 
 ## Architecture Decision
 
-We chose WebSocket for bidirectional capability (future trading features) over SSE. See ADR‑005.
+We chose WebSocket for bidirectional capability (future trading features) over SSE. See the [Real-Time Communication Strategy](../adrs/real-time-communication).

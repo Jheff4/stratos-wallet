@@ -116,7 +116,7 @@ My process:
 <h4>Related in this project</h4>
 <ul>
 <li><a href="../stories/two-filing-cabinets">Story: The Two Filing Cabinets</a></li>
-<li><a href="../adrs/001-use-vertical-slices">ADR 001 — Vertical Slice Architecture</a></li>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
+<li><a href="../adrs/vertical-slice-architecture">Vertical Slice Architecture</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model</a></li>
 </ul>
 </div>

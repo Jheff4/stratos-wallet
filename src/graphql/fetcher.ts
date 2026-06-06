@@ -31,6 +31,12 @@ export async function graphqlFetch<TData, TVariables>(
       }),
     });
 
+    if (!res.ok) {
+      const message = `GraphQL request failed: HTTP ${res.status}`;
+      logger.error(message, { traceId, status: res.status, duration: performance.now() - start });
+      throw new Error(message);
+    }
+
     const json = await res.json();
 
     if (json.errors) {

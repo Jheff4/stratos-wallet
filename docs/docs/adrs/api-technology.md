@@ -1,7 +1,4 @@
-# 003: API Technology Choice
-
-- **Date**: 2026-05-12
-- **Status**: accepted
+# API Technology Choice
 
 ## Context
 

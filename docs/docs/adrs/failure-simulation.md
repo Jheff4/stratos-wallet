@@ -1,7 +1,4 @@
-# 006: Failure Simulation & Resilience System
-
-- **Date**: 2026-05-20
-- **Status**: accepted
+# Failure Simulation & Resilience System
 
 ## Context
 

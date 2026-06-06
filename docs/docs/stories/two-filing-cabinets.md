@@ -88,7 +88,7 @@ The rule in Stratos Wallet is: one Map, consulted by all. `getWalletById()`, `ge
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model</a></li>
 <li><a href="../interview/behavioural">Interview: Tell me about a bug that was hard to find</a></li>
 </ul>
 </div>

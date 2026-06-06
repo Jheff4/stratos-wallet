@@ -2,30 +2,31 @@ import BalanceTrend from './components/BalanceTrend';
 import SpendingChart from './components/SpendingChart';
 import PortfolioPie from './components/PortfolioPie';
 import QueryErrorBoundary from '@shared/components/QueryErrorBoundary';
-// import AccountSummary from '@features/accounts/components/AccountSummary';
-// import TransactionWidget from '@features/transactions/components/TransactionWidget';
 
 export default function DashboardPage() {
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>Financial Dashboard</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-        <QueryErrorBoundary>
-          <BalanceTrend walletId="w1" />
-        </QueryErrorBoundary>
+    <>
+      <div className="page-header">
+        <h1 className="page-title">Dashboard</h1>
+        <p className="page-subtitle">Your financial overview at a glance</p>
+      </div>
 
-        <QueryErrorBoundary>
-          <PortfolioPie walletId="w1" />
-        </QueryErrorBoundary>
-        
+      <div className="page-body flex-col gap-5">
+        {/* Top row: balance + portfolio */}
+        <div className="grid-2">
+          <QueryErrorBoundary>
+            <BalanceTrend walletId="w1" />
+          </QueryErrorBoundary>
+          <QueryErrorBoundary>
+            <PortfolioPie walletId="w1" />
+          </QueryErrorBoundary>
+        </div>
+
+        {/* Bottom row: spending */}
         <QueryErrorBoundary>
           <SpendingChart walletId="w1" />
         </QueryErrorBoundary>
-        {/* <AccountSummary /> */}
       </div>
-      <div style={{ marginTop: '1rem' }}>
-        {/* <TransactionWidget /> */}
-      </div>
-    </div>
+    </>
   );
 }

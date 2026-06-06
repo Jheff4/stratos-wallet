@@ -83,7 +83,7 @@ If any of those functions ever have a bug — and they will — the fix is a cod
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model</a></li>
 <li><a href="../interview/data-and-state">Interview: Data & State Questions</a></li>
 <li><a href="../interview/behavioural">Interview: Tell me about a hard architectural decision</a></li>
 </ul>

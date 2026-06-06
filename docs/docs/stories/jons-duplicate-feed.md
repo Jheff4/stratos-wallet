@@ -103,7 +103,7 @@ The eventId is the key to this. A random UUID assigned at emission time, the sam
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol</a></li>
+<li><a href="../adrs/websocket-reliability-protocol">WebSocket Reliability Protocol</a></li>
 <li><a href="../interview/real-time">Interview: How do you deduplicate events in a real-time feed?</a></li>
 </ul>
 </div>

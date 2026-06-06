@@ -1,383 +1,330 @@
-import { useState } from 'react';
-import {
-  useChaos,
-  CHAOS_PRESETS,
-  type ChaosPresetKey,
-} from './ChaosContext';
+import { useChaos, type ChaosPresetKey } from './ChaosContext';
+import { useAppStore } from '../store';
+
+// const PRESETS = Object.keys(CHAOS_PRESETS) as ChaosPresetKey[];
+
+// Group presets visually
+const PRESET_GROUPS: { label: string; keys: ChaosPresetKey[] }[] = [
+  {
+    label: 'Network',
+    keys: ['normal', 'slow3G', 'extremeLatency', 'mobileTrainTunnel'],
+  },
+  {
+    label: 'Failures',
+    keys: ['flakyBackend', 'intermittentOutage', 'offlineMode', 'rateLimited', 'catastrophicFailure'],
+  },
+  {
+    label: 'WebSocket',
+    keys: ['websocketStorm', 'websocketInstability', 'eventReordering', 'packetLoss', 'highFrequencyRealtime'],
+  },
+  {
+    label: 'Mixed',
+    keys: ['partialDataFailure', 'productionChaos'],
+  },
+];
+
+function isChaosActive(config: ReturnType<typeof useChaos>['config']) {
+  return (
+    config.latencyMax > 0 ||
+    config.errorRate > 0 ||
+    config.messageDropRate > 0 ||
+    config.messageReorderRate > 0 ||
+    config.partialResponseRate > 0 ||
+    config.duplicateWsEvents ||
+    config.forceDisconnect
+  );
+}
 
 export default function ChaosPanel() {
-  const {
-    config,
-    updateConfig,
-    applyPreset,
-    resetConfig,
-  } = useChaos();
-
-  const [isOpen, setIsOpen] = useState(true);
+  const { config, updateConfig, applyPreset, resetConfig } = useChaos();
+  const isOpen   = useAppStore((s) => s.chaosPanelOpen);
+  const setOpen  = useAppStore((s) => s.setChaosPanel);
+  const chaosOn  = isChaosActive(config);
 
   return (
-    <div
-      style={{
+    <>
+      {/* Slide-in drawer */}
+      <div style={{
         position: 'fixed',
-        bottom: 16,
-        right: 16,
-        width: 360,
-        background: '#111',
-        color: '#fff',
-        border: '1px solid #333',
-        borderRadius: 12,
-        overflow: 'hidden',
-        zIndex: 9999,
-        fontFamily: 'Inter, sans-serif',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: '1rem',
-          borderBottom: '1px solid #222',
+        bottom: 0,
+        right: 0,
+        width: 340,
+        maxHeight: '80vh',
+        background: '#0d1117',
+        border: '1px solid #21262d',
+        borderBottom: 'none',
+        borderRight: 'none',
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 0,
+        zIndex: 9998,
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '-4px -4px 32px rgba(0,0,0,0.5)',
+        transform: isOpen ? 'translateY(0)' : 'translateY(110%)',
+        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        fontFamily: 'var(--font-sans)',
+      }}>
+        {/* Header */}
+        <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#181818',
-        }}
-      >
-        <div>
-          <div
+          padding: '12px 16px',
+          borderBottom: '1px solid #21262d',
+          flexShrink: 0,
+          background: chaosOn ? 'rgba(239,68,68,0.06)' : undefined,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14 }}>⚡</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#e6edf3', display: 'flex', alignItems: 'center', gap: 6 }}>
+                Chaos Console
+                {chaosOn && (
+                  <span style={{
+                    fontSize: 10, fontWeight: 700,
+                    background: 'rgba(239,68,68,0.2)',
+                    color: '#f87171',
+                    border: '1px solid rgba(239,68,68,0.35)',
+                    borderRadius: 99,
+                    padding: '1px 7px',
+                    letterSpacing: '0.04em',
+                  }}>
+                    ACTIVE
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: '#8b949e', marginTop: 1 }}>
+                {chaosOn
+                  ? `${config.errorRate > 0 ? `${Math.round(config.errorRate * 100)}% errors · ` : ''}${config.latencyMax > 0 ? `${config.latencyMin}–${config.latencyMax}ms latency · ` : ''}fault injection on`
+                  : 'Runtime fault injection · all clear'}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setOpen(false)}
             style={{
-              fontWeight: 700,
-              fontSize: 14,
+              background: 'none',
+              border: 'none',
+              color: '#8b949e',
+              cursor: 'pointer',
+              fontSize: 18,
+              lineHeight: 1,
+              padding: '2px 6px',
+              borderRadius: 4,
             }}
           >
-            Chaos Console
-          </div>
-
-          <div
-            style={{
-              fontSize: 12,
-              color: '#888',
-              marginTop: 4,
-            }}
-          >
-            Runtime fault injection
-          </div>
+            ×
+          </button>
         </div>
 
-        <button
-          onClick={() => setIsOpen((prev) => !prev)}
-          style={buttonStyle}
-        >
-          {isOpen ? 'Hide' : 'Show'}
-        </button>
-      </div>
-
-      {isOpen && (
-        <div
-          style={{
-            padding: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-          }}
-        >
-          {/* Presets */}
-          <section>
-            <div style={sectionTitleStyle}>
-              Presets
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 8,
-              }}
-            >
-              {Object.keys(CHAOS_PRESETS).map((preset) => (
-                <button
-                  key={preset}
-                  onClick={() =>
-                    applyPreset(preset as ChaosPresetKey)
-                  }
-                  style={presetButtonStyle}
-                >
-                  {preset}
-                </button>
-              ))}
-            </div>
-          </section>
+        {/* Scrollable body */}
+        <div style={{
+          overflowY: 'auto',
+          flex: 1,
+          padding: '12px 16px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+        }}>
+          {/* Preset groups */}
+          {PRESET_GROUPS.map((group) => (
+            <section key={group.label}>
+              <div style={sectionLabel}>{group.label}</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {group.keys.map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => applyPreset(key)}
+                    style={presetBtn}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
 
           {/* Latency */}
           <section>
-            <div style={sectionTitleStyle}>
-              Network Latency
-            </div>
-
-            <div style={inputGroupStyle}>
-              <label style={labelStyle}>
-                Min Latency
-              </label>
-
-              <input
-                type="number"
-                value={config.latencyMin}
-                onChange={(e) =>
-                  updateConfig({
-                    latencyMin: Number(e.target.value),
-                  })
-                }
-                style={inputStyle}
-              />
-            </div>
-
-            <div style={inputGroupStyle}>
-              <label style={labelStyle}>
-                Max Latency
-              </label>
-
-              <input
-                type="number"
-                value={config.latencyMax}
-                onChange={(e) =>
-                  updateConfig({
-                    latencyMax: Number(e.target.value),
-                  })
-                }
-                style={inputStyle}
-              />
+            <div style={sectionLabel}>Network Latency (ms)</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div>
+                <label style={fieldLabel}>Min</label>
+                <input
+                  type="number"
+                  value={config.latencyMin}
+                  onChange={(e) => updateConfig({ latencyMin: Number(e.target.value) })}
+                  style={input}
+                />
+              </div>
+              <div>
+                <label style={fieldLabel}>Max</label>
+                <input
+                  type="number"
+                  value={config.latencyMax}
+                  onChange={(e) => updateConfig({ latencyMax: Number(e.target.value) })}
+                  style={input}
+                />
+              </div>
             </div>
           </section>
 
-          {/* Error Rate */}
+          {/* Error rate */}
           <section>
-            <div style={sectionTitleStyle}>
-              Failure Rate
-            </div>
-
-            <div style={inputGroupStyle}>
-              <label style={labelStyle}>
-                Error Rate
-              </label>
-
+            <div style={sectionLabel}>Error Rate</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <input
-                type="number"
-                step="0.05"
-                min="0"
-                max="1"
+                type="range"
+                min="0" max="1" step="0.05"
                 value={config.errorRate}
-                onChange={(e) =>
-                  updateConfig({
-                    errorRate: Number(e.target.value),
-                  })
-                }
-                style={inputStyle}
+                onChange={(e) => updateConfig({ errorRate: Number(e.target.value) })}
+                style={{ flex: 1, accentColor: '#f87171' }}
               />
-            </div>
-
-            <div
-              style={{
-                fontSize: 12,
-                color: '#888',
-                marginTop: 4,
-              }}
-            >
-              {Math.round(config.errorRate * 100)}%
-              requests fail
+              <span style={{ fontSize: 12, color: '#f87171', fontWeight: 600, minWidth: 36 }}>
+                {Math.round(config.errorRate * 100)}%
+              </span>
             </div>
           </section>
 
-          {/* WebSocket Controls */}
+          {/* WS toggles */}
           <section>
-            <div style={sectionTitleStyle}>
-              WebSocket Simulation
+            <div style={sectionLabel}>WebSocket Faults</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {([
+                ['duplicateWsEvents', 'Duplicate Events'],
+                ['forceDisconnect',   'Force Disconnect'],
+              ] as const).map(([key, label]) => (
+                <label key={key} style={toggleRow}>
+                  <span style={{ color: '#c9d1d9', fontSize: 13 }}>{label}</span>
+                  <input
+                    type="checkbox"
+                    checked={config[key] as boolean}
+                    onChange={(e) => updateConfig({ [key]: e.target.checked })}
+                    style={{ accentColor: '#4f6ef7', width: 14, height: 14, cursor: 'pointer' }}
+                  />
+                </label>
+              ))}
+              <label style={toggleRow}>
+                <span style={{ color: '#c9d1d9', fontSize: 13 }}>Message Drop Rate</span>
+                <input
+                  type="checkbox"
+                  checked={config.messageDropRate > 0}
+                  onChange={(e) => updateConfig({ messageDropRate: e.target.checked ? 0.15 : 0 })}
+                  style={{ accentColor: '#4f6ef7', width: 14, height: 14, cursor: 'pointer' }}
+                />
+              </label>
+              <label style={toggleRow}>
+                <span style={{ color: '#c9d1d9', fontSize: 13 }}>Message Reorder</span>
+                <input
+                  type="checkbox"
+                  checked={config.messageReorderRate > 0}
+                  onChange={(e) => updateConfig({ messageReorderRate: e.target.checked ? 0.15 : 0 })}
+                  style={{ accentColor: '#4f6ef7', width: 14, height: 14, cursor: 'pointer' }}
+                />
+              </label>
             </div>
-
-            <Toggle
-              label="Duplicate Events"
-              checked={config.duplicateWsEvents}
-              onChange={(checked) =>
-                updateConfig({
-                  duplicateWsEvents: checked,
-                })
-              }
-            />
-
-            <Toggle
-              label="Force Disconnect"
-              checked={config.forceDisconnect}
-              onChange={(checked) =>
-                updateConfig({
-                  forceDisconnect: checked,
-                })
-              }
-            />
-            
-            <Toggle
-              label="Message Drop Rate"
-              checked={config.messageDropRate > 0}
-              onChange={(checked) =>
-                updateConfig({
-                  messageDropRate: checked ? 0.1 : 0,
-                })
-              }
-            />
-            
-            <Toggle
-              label="Message Reorder Rate"
-              checked={config.messageReorderRate > 0}
-              onChange={(checked) =>
-                updateConfig({
-                  messageReorderRate: checked ? 0.1 : 0,
-                })
-              }
-            />
-            
-            <Toggle
-              label="Partial Response Rate"
-              checked={config.partialResponseRate > 0}
-              onChange={(checked) =>
-                updateConfig({
-                  partialResponseRate: checked ? 0.1 : 0,
-                })
-              }
-            />
           </section>
 
-          {/* Current State */}
+          {/* Current state */}
           <section>
-            <div style={sectionTitleStyle}>
-              Current Runtime State
-            </div>
-
-            <pre
-              style={{
-                background: '#0d0d0d',
-                border: '1px solid #222',
-                padding: '0.75rem',
-                borderRadius: 8,
-                fontSize: 11,
-                overflowX: 'auto',
-                color: '#00ff95',
-              }}
-            >
+            <div style={sectionLabel}>Current State</div>
+            <pre style={{
+              background: '#010409',
+              border: '1px solid #21262d',
+              borderRadius: 6,
+              padding: '8px 10px',
+              fontSize: 10.5,
+              color: '#3fb950',
+              overflowX: 'auto',
+              margin: 0,
+              lineHeight: 1.6,
+            }}>
               {JSON.stringify(config, null, 2)}
             </pre>
           </section>
-
-          {/* Footer Actions */}
-          <section
-            style={{
-              display: 'flex',
-              gap: 8,
-            }}
-          >
-            <button
-              onClick={resetConfig}
-              style={{
-                ...buttonStyle,
-                flex: 1,
-              }}
-            >
-              Reset
-            </button>
-
-            <button
-              onClick={() =>
-                applyPreset('productionChaos')
-              }
-              style={{
-                ...buttonStyle,
-                flex: 1,
-              }}
-            >
-              Chaos Mode
-            </button>
-          </section>
         </div>
-      )}
-    </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '10px 16px',
+          borderTop: '1px solid #21262d',
+          display: 'flex',
+          gap: 8,
+          flexShrink: 0,
+        }}>
+          <button onClick={resetConfig} style={footerBtn}>
+            Reset
+          </button>
+          <button
+            onClick={() => applyPreset('productionChaos')}
+            style={{ ...footerBtn, background: 'rgba(239,68,68,0.1)', color: '#f87171', borderColor: 'rgba(239,68,68,0.25)' }}
+          >
+            ⚡ Chaos Mode
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 
-interface ToggleProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}
-
-function Toggle({
-  label,
-  checked,
-  onChange,
-}: ToggleProps) {
-  return (
-    <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 12,
-        fontSize: 13,
-      }}
-    >
-      <span>{label}</span>
-
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) =>
-          onChange(e.target.checked)
-        }
-      />
-    </label>
-  );
-}
-
-const sectionTitleStyle = {
-  fontSize: 12,
+// ---- Style constants ----
+const sectionLabel: React.CSSProperties = {
+  fontSize: 10,
   fontWeight: 700,
-  marginBottom: 12,
-  textTransform: 'uppercase' as const,
-  color: '#888',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: '#8b949e',
+  marginBottom: 8,
 };
 
-const inputGroupStyle = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  marginBottom: 12,
+const fieldLabel: React.CSSProperties = {
+  display: 'block',
+  fontSize: 11,
+  color: '#8b949e',
+  marginBottom: 4,
 };
 
-const labelStyle = {
-  fontSize: 12,
-  marginBottom: 6,
-  color: '#bbb',
-};
-
-const inputStyle = {
-  background: '#0d0d0d',
-  border: '1px solid #333',
-  color: '#fff',
-  borderRadius: 8,
-  padding: '0.6rem',
+const input: React.CSSProperties = {
+  width: '100%',
+  background: '#161b22',
+  border: '1px solid #30363d',
+  borderRadius: 6,
+  color: '#e6edf3',
+  padding: '5px 8px',
+  fontSize: 13,
   outline: 'none',
+  fontFamily: 'var(--font-sans)',
 };
 
-const buttonStyle = {
-  background: '#222',
-  color: '#fff',
-  border: '1px solid #333',
-  borderRadius: 8,
-  padding: '0.6rem 0.8rem',
+const toggleRow: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '5px 0',
   cursor: 'pointer',
 };
 
-const presetButtonStyle = {
-  background: '#181818',
-  color: '#ccc',
-  border: '1px solid #333',
-  borderRadius: 999,
-  padding: '0.45rem 0.75rem',
+const presetBtn: React.CSSProperties = {
+  background: '#161b22',
+  border: '1px solid #30363d',
+  borderRadius: 99,
+  color: '#8b949e',
+  fontSize: 11,
+  padding: '3px 10px',
   cursor: 'pointer',
+  fontFamily: 'var(--font-sans)',
+  transition: 'background 0.1s, color 0.1s',
+};
+
+const footerBtn: React.CSSProperties = {
+  flex: 1,
+  background: '#161b22',
+  border: '1px solid #30363d',
+  borderRadius: 6,
+  color: '#c9d1d9',
   fontSize: 12,
+  fontWeight: 500,
+  padding: '6px 0',
+  cursor: 'pointer',
+  fontFamily: 'var(--font-sans)',
 };

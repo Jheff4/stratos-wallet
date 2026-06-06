@@ -1,12 +1,10 @@
-# ADR 007 — WebSocket Reliability Protocol
-
-<span class="stratos-status stratos-status--accepted">Accepted</span> · 2026-06-01
+# WebSocket Reliability Protocol
 
 ---
 
 ## Context
 
-ADR 005 established WebSocket as the real-time transport. The initial `useWebSocket` implementation handled reconnection and chaos simulation, but lacked protocol-level reliability:
+established WebSocket as the real-time transport. The initial `useWebSocket` implementation handled reconnection and chaos simulation, but lacked protocol-level reliability:
 
 1. **No event deduplication.** When `duplicateWsEvents` chaos was enabled, the hook delivered both the original event and the duplicate — doubling every transaction in the feed and corrupting the balance display.
 
@@ -173,9 +171,9 @@ This pattern is used by AWS SDKs, Stripe's client libraries, and virtually every
 </div>
 
 <div class="stratos-related">
-<h4>Related ADRs</h4>
+<h4>Related decisions</h4>
 <ul>
-<li><a href="./005-real-time-communication">ADR 005 — Real-Time Communication Strategy</a></li>
-<li><a href="./006-failure-system">ADR 006 — Failure Simulation & Resilience System</a></li>
+<li><a href="./real-time-communication">Real-Time Communication Strategy</a></li>
+<li><a href="./failure-simulation">Failure Simulation & Resilience System</a></li>
 </ul>
 </div>

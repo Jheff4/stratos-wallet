@@ -137,7 +137,7 @@ Done correctly, they make an application feel like it's running locally. Done in
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/004-idempotency-optimistic-updates">ADR 004 — Idempotency & Optimistic Updates</a></li>
+<li><a href="../adrs/idempotency-and-optimistic-updates">Idempotency & Optimistic Updates</a></li>
 <li><a href="../interview/react-architecture">Interview: Optimistic updates and when they can go wrong</a></li>
 </ul>
 </div>

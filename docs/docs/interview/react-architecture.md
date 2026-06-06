@@ -174,8 +174,8 @@ A user starts a transfer, navigates away before it resolves, and comes back. If 
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>
-<li><a href="../adrs/001-use-vertical-slices">ADR 001 — Vertical Slice Architecture</a></li>
-<li><a href="../adrs/004-idempotency-optimistic-updates">ADR 004 — Idempotency & Optimistic Updates</a></li>
+<li><a href="../adrs/vertical-slice-architecture">Vertical Slice Architecture</a></li>
+<li><a href="../adrs/idempotency-and-optimistic-updates">Idempotency & Optimistic Updates</a></li>
 <li><a href="../stories/nates-messy-flat">Story: Nate's Messy Flat</a></li>
 <li><a href="../stories/the-optimistic-chef">Story: The Optimistic Chef</a></li>
 </ul>

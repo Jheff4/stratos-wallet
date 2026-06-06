@@ -136,9 +136,9 @@ The skill is knowing that you have a choice — and being able to articulate the
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
-<li><a href="../adrs/002-state-management">ADR 002 — State Management Strategy</a></li>
-<li><a href="../adrs/004-idempotency-optimistic-updates">ADR 004 — Idempotency & Optimistic Updates</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model</a></li>
+<li><a href="../adrs/state-management">State Management Strategy</a></li>
+<li><a href="../adrs/idempotency-and-optimistic-updates">Idempotency & Optimistic Updates</a></li>
 <li><a href="../stories/nates-missing-thousands">Story: Nate's Missing Thousands</a></li>
 <li><a href="../stories/sams-invisible-bug">Story: Sam's Invisible Bug</a></li>
 </ul>

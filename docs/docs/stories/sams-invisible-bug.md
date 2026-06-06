@@ -137,7 +137,7 @@ Understanding this tradeoff and its evolution path is the difference between som
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model (snapshots section)</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model (snapshots section)</a></li>
 <li><a href="../interview/data-and-state">Interview: What is event sourcing and when would you use it?</a></li>
 <li><a href="../interview/system-design">Interview: Design a transaction history that scales</a></li>
 </ul>

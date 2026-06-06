@@ -1,10 +1,9 @@
-// import { delay } from "msw";
+import { HttpResponse } from 'msw';
 
-// Default chaos configuration
 export interface ChaosConfig {
-  latencyMin: number;   // ms
-  latencyMax: number;   // ms
-  errorRate: number;    // 0-1
+  latencyMin: number;
+  latencyMax: number;
+  errorRate: number;
   duplicateWsEvents: boolean;
   forceDisconnect: boolean;
   messageDropRate: number;
@@ -31,43 +30,46 @@ export function updateChaosConfig(newConfig: Partial<ChaosConfig>) {
   config = { ...config, ...newConfig };
 }
 
-// Helper to apply chaos to a resolver
-export async function applyChaos() {
-  const { latencyMin, latencyMax, errorRate, messageDropRate, messageReorderRate, partialResponseRate } = config;
+/**
+ * Apply chaos to a request handler.
+ *
+ * Returns an HttpResponse if chaos should short-circuit the handler,
+ * or null if the handler should proceed normally.
+ *
+ * Handlers must check the return value:
+ *   const chaos = await applyChaos();
+ *   if (chaos) return chaos;
+ */
+export async function applyChaos(): Promise<HttpResponse | null> {
+  const { latencyMin, latencyMax, errorRate, messageDropRate, partialResponseRate } = config;
 
-  console.log('[CHAOS]', config);
-
-
-  // Random latency
+  // 1. Simulated network latency
   if (latencyMax > 0) {
     const delay = latencyMin + Math.random() * (latencyMax - latencyMin);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
-  // Random error
-  if (Math.random() < errorRate) {
-    throw new Error('Simulated server error');
-  }
-  
-  // Message drop
-  if (Math.random() < messageDropRate) {
-    return null;
-  }
-
-  console.log('[CHAOS] throwing error');
-  
-  // Message reorder
-  if (Math.random() < messageReorderRate) {
-    return 'reordered';
-  }
-  
-  // Partial response
-  if (Math.random() < partialResponseRate) {
-    return 'partial';
+  // 2. Random server error — returns a proper 500 with GraphQL-shaped body
+  //    so the fetcher's res.ok check catches it and React Query surfaces an error.
+  if (errorRate > 0 && Math.random() < errorRate) {
+    return HttpResponse.json(
+      { errors: [{ message: 'Simulated server error (chaos)' }] },
+      { status: 500 },
+    );
   }
 
-  console.log('[CHAOS] no chaos');
-  
-  // No chaos
-  return 'ok';
+  // 3. Message drop — 503 with no body (simulates backend gone)
+  if (messageDropRate > 0 && Math.random() < messageDropRate) {
+    return new HttpResponse(null, { status: 503 });
+  }
+
+  // 4. Partial response — 206 with a truncated / empty data payload
+  if (partialResponseRate > 0 && Math.random() < partialResponseRate) {
+    return HttpResponse.json(
+      { data: null, errors: [{ message: 'Partial response (chaos)' }] },
+      { status: 206 },
+    );
+  }
+
+  return null;
 }

@@ -191,13 +191,35 @@ html {
    NAVBAR
    ============================================================ */
 
-.navbar {
+/* backdrop-filter would make .navbar a containing block for position:fixed children
+   (incl. the mobile sidebar), trapping it at navbar height. Use a pseudo-element
+   so the blur applies without creating a new containing block on the navbar itself. */
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   backdrop-filter: saturate(180%) blur(8px);
   -webkit-backdrop-filter: saturate(180%) blur(8px);
+  pointer-events: none;
 }
 
 [data-theme='dark'] .navbar {
-  background-color: rgba(13,17,23,0.85);
+  background-color: rgba(13,17,23,0.92);
+}
+
+.navbar__brand {
+  gap: 10px;
+}
+
+.navbar__logo {
+  height: 28px;
+  width: 28px;
+}
+
+/* Logo SVG is only rendered as themedComponent--dark; force it visible in both modes */
+.navbar__logo img {
+  display: block !important;
 }
 
 .navbar__title {
@@ -205,9 +227,87 @@ html {
   letter-spacing: -0.025em;
 }
 
+[data-theme='dark'] .navbar__title {
+  color: #f0f4ff;
+}
+
 .navbar__item {
   font-size: 14px;
   font-weight: 500;
+}
+
+/* ---- Hamburger — small bordered button with thin 3-line icon ---- */
+.navbar__toggle {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--stratos-border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+/* Hide the default thick SVG */
+.navbar__toggle svg {
+  display: none;
+}
+
+/* Recreate as 3 thin lines using box-shadow */
+.navbar__toggle::before {
+  content: '';
+  display: block;
+  width: 13px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  box-shadow: 0 4.5px 0 currentColor, 0 -4.5px 0 currentColor;
+  opacity: 0.75;
+}
+
+/* Hide theme toggle from sidebar brand — it stays in the top navbar */
+.navbar-sidebar__brand [class*="toggle"],
+.navbar-sidebar__brand [class*="colorMode"] {
+  display: none !important;
+}
+
+/* ---- Mobile: keep the theme toggle in the top navbar (not the sidebar) ----
+   Docusaurus hides the navbar-right color toggle below 996px and relocates it
+   to the sidebar. We reverse that: show it in the navbar, hide it in the sidebar. */
+@media (max-width: 996px) {
+  .navbar__items--right {
+    display: flex;
+  }
+
+  .navbar__items--right [class*="colorModeToggle"] {
+    display: flex !important;
+  }
+}
+
+/* ---- Sidebar close (✕) button — smaller, subtle ---- */
+.navbar-sidebar__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---- Theme stability on small screens ---- */
+/* Ensure navbar bg token resolves correctly in both themes at all widths */
+@media (max-width: 996px) {
+  :root {
+    --ifm-navbar-background-color: var(--stratos-surface-0);
+  }
+
+  [data-theme='dark'] {
+    --ifm-navbar-background-color: rgba(13, 17, 23, 0.92);
+  }
+}
+
+/* Hide "Edit this page" and "Last updated" footers */
+.theme-doc-footer-edit-meta-row,
+.theme-last-updated {
+  display: none;
 }
 
 /* ============================================================
@@ -246,6 +346,10 @@ html {
   letter-spacing: -0.04em;
   line-height: 1.15;
   margin-bottom: 0.5rem;
+}
+
+[data-theme='dark'] .markdown h1 {
+  color: #f0f4ff;
 }
 
 .markdown h2 {
@@ -719,7 +823,7 @@ div[class*='tableWrapper'] {
 }
 
 .interview-q::before {
-  content: "Q  ";
+  content: "Question";
   font-family: var(--stratos-font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -850,4 +954,218 @@ div[class*='tableWrapper'] {
 [data-theme='dark'] .stratos-related a:hover {
   border-color: var(--stratos-brand-300);
   background: color-mix(in srgb, var(--stratos-brand-300) 10%, transparent);
+}
+
+/* ============================================================
+   BREADCRUMBS — hidden via config + CSS backup
+   ============================================================ */
+
+.theme-doc-breadcrumbs {
+  display: none;
+}
+
+/* ============================================================
+   TABLE OF CONTENTS
+   ============================================================ */
+
+/* Desktop: "On this page" label above the right-rail links */
+.theme-doc-toc-desktop::before {
+  content: "On this page";
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--stratos-ink-400);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--stratos-border-light);
+}
+
+[data-theme='dark'] .theme-doc-toc-desktop::before {
+  color: var(--stratos-ink-300);
+}
+
+/* Mobile collapsible TOC — slim underline, no card.
+   !important needed because CSS module class loads after customCss. */
+.theme-doc-toc-mobile {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 0 1.25rem;
+}
+
+/* "On this page" toggle — chip-style label that sits cleanly above content */
+.theme-doc-toc-mobile button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stratos-ink-400);
+  background: var(--stratos-surface-100) !important;
+  border: 1px solid var(--stratos-border-light) !important;
+  border-radius: var(--stratos-radius-md) !important;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.theme-doc-toc-mobile button:hover {
+  color: var(--stratos-brand-500);
+  background: color-mix(in srgb, var(--stratos-brand-500) 5%, var(--stratos-surface-100)) !important;
+}
+
+[data-theme='dark'] .theme-doc-toc-mobile button {
+  color: var(--stratos-ink-300);
+  background: var(--stratos-surface-100) !important;
+  border-color: var(--stratos-border-medium) !important;
+}
+
+/* TOC items when expanded */
+.theme-doc-toc-mobile .table-of-contents {
+  margin-top: 0.5rem;
+  padding-left: 0;
+}
+
+.theme-doc-toc-mobile .table-of-contents__link {
+  display: block;
+  padding: 4px 2px;
+  font-size: 13px;
+  color: var(--stratos-ink-500);
+  transition: color 0.15s;
+}
+
+.theme-doc-toc-mobile .table-of-contents__link:hover,
+.theme-doc-toc-mobile .table-of-contents__link--active {
+  color: var(--stratos-brand-500);
+}
+
+[data-theme='dark'] .theme-doc-toc-mobile .table-of-contents__link {
+  color: var(--stratos-ink-300);
+}
+
+/* ============================================================
+   MOBILE SIDEBAR — dark panel, matches the main app
+   Override Infima CSS variables so the cascade handles
+   menu link colors automatically — no specificity fights.
+   ============================================================ */
+
+@media (max-width: 996px) {
+  /* Sidebar panel — dark navy, always (matches the main app) */
+  .navbar-sidebar {
+    /* Override Infima's menu CSS vars so all links cascade correctly */
+    --ifm-menu-color:                    #94a3b8;
+    --ifm-menu-color-active:             #c7d2fe;
+    --ifm-menu-color-background-active:  rgba(79, 110, 247, 0.18);
+    --ifm-menu-color-background-hover:   rgba(255, 255, 255, 0.06);
+    --ifm-navbar-background-color:       #0f172a;
+    --ifm-navbar-link-color:             #94a3b8;
+
+    background-color: #0f172a;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Brand row */
+  .navbar-sidebar__brand {
+    background-color: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  /* Items container and each panel — transparent so sidebar bg shows */
+  .navbar-sidebar__items,
+  .navbar-sidebar__item {
+    background-color: transparent;
+  }
+
+  /* Logo + title */
+  .navbar-sidebar .navbar__title { color: #e2e8f0; }
+  .navbar-sidebar .navbar__logo  { height: 26px; width: 26px; }
+
+  /* Close button */
+  .navbar-sidebar__close { color: #64748b; }
+  .navbar-sidebar__close:hover { color: #e2e8f0; }
+
+  /* Backdrop */
+  .navbar-sidebar__backdrop { background-color: rgba(0, 0, 0, 0.6); }
+
+  /* Menu item padding */
+  .navbar-sidebar__item.menu { padding: 8px 10px; }
+
+  /* Category labels — small-caps above groups */
+  .navbar-sidebar .menu__list-item-collapsible > .menu__link {
+    color: #475569 !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent !important;
+  }
+
+  /* Caret triangles */
+  .navbar-sidebar .menu__caret::before { border-color: #475569; }
+
+  /* All nav links — use normal sizes, Infima vars handle hover/active bg */
+  .navbar-sidebar .menu__link {
+    font-size: 13.5px;
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+
+  /* Nested list indent line */
+  .navbar-sidebar .menu__list .menu__list {
+    padding-left: 8px;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    margin-left: 8px;
+  }
+
+  /* Scrollbar */
+  .navbar-sidebar::-webkit-scrollbar       { width: 4px; }
+  .navbar-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — typography, tables, layout
+   ============================================================ */
+
+@media (max-width: 996px) {
+  .navbar__logo {
+    height: 24px;
+    width: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .markdown h1 { font-size: 1.65rem; }
+  .markdown h2 { font-size: 1.2rem; margin-top: 2rem; }
+  .markdown h3 { font-size: 1rem; }
+  .markdown p  { font-size: 14.5px; line-height: 1.75; }
+
+  /* Tables: scroll horizontally */
+  .markdown table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    min-width: unset;
+    width: auto !important;
+  }
+
+  .prism-code { font-size: 12.5px; }
+
+  .pagination-nav {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .interview-q,
+  .interview-a {
+    padding: 12px 14px;
+  }
 }

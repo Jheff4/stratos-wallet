@@ -233,8 +233,8 @@ Don't test implementation details — test observable behaviour. The test for de
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>
-<li><a href="../adrs/007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol</a></li>
-<li><a href="../adrs/008-ledger-first-data-model">ADR 008 — Ledger-First Data Model</a></li>
+<li><a href="../adrs/websocket-reliability-protocol">WebSocket Reliability Protocol</a></li>
+<li><a href="../adrs/ledger-first-data-model">Ledger-First Data Model</a></li>
 <li><a href="../stories/azeez-in-the-tunnel">Story: Azeez in the Tunnel</a></li>
 <li><a href="../stories/nates-missing-thousands">Story: Nate's Missing Thousands</a></li>
 </ul>

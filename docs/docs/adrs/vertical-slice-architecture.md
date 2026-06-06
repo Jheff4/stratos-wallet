@@ -1,6 +1,4 @@
-# ADR 001 — Vertical Slice Architecture
-
-<span class="stratos-status stratos-status--accepted">Accepted</span> · 2026-05-11
+# Vertical Slice Architecture
 
 ---
 

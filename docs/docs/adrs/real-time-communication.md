@@ -1,6 +1,4 @@
-# ADR 005 — Real-Time Communication Strategy
-
-<span class="stratos-status stratos-status--accepted">Accepted</span> · 2026-05-15
+# Real-Time Communication Strategy
 
 ---
 
@@ -188,9 +186,9 @@ The answer that distinguishes staff-level thinking: "I'd use WebSocket for deliv
 </div>
 
 <div class="stratos-related">
-<h4>Related ADRs</h4>
+<h4>Related decisions</h4>
 <ul>
-<li><a href="./007-websocket-reliability-protocol">ADR 007 — WebSocket Reliability Protocol (implementation)</a></li>
-<li><a href="./006-failure-system">ADR 006 — Failure Simulation & Resilience System</a></li>
+<li><a href="./websocket-reliability-protocol">WebSocket Reliability Protocol (implementation)</a></li>
+<li><a href="./failure-simulation">Failure Simulation & Resilience System</a></li>
 </ul>
 </div>

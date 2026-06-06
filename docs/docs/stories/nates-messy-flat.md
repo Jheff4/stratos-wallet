@@ -131,7 +131,7 @@ Vertical slices scale with the team. Each feature is a zone. The zone has an own
 <div class="stratos-related">
 <h4>Go Deeper</h4>
 <ul>
-<li><a href="../adrs/001-use-vertical-slices">ADR 001 — Vertical Slice Architecture</a></li>
+<li><a href="../adrs/vertical-slice-architecture">Vertical Slice Architecture</a></li>
 <li><a href="../interview/react-architecture">Interview: How would you structure a large React codebase?</a></li>
 <li><a href="../interview/behavioural">Interview: How do you approach an unfamiliar codebase?</a></li>
 </ul>

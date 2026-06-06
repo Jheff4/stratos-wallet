@@ -1,4 +1,4 @@
-import { graphql, HttpResponse, http } from 'msw'
+import { graphql, HttpResponse, http } from 'msw';
 import {
   ledger,
   getAllWallets,
@@ -10,21 +10,26 @@ import {
   computeSpendingByCategory,
   type LedgerEntry,
   type WalletDef,
-} from './data'
+} from './data';
 
 import { registerUser, authenticateUser, createToken, findUserByEmail } from './auth';
 import { applyChaos, updateChaosConfig } from './chaos';
 
-const idempotencyStore = new Map<string, any>()
+const idempotencyStore = new Map<string, any>();
 
 export const handlers = [
+  // ======================================================
+  // Chaos config endpoint (no chaos applied here)
+  // ======================================================
   http.post('/chaos/config', async ({ request }) => {
     const body = await request.json() as any;
     updateChaosConfig(body);
     return HttpResponse.json({ success: true });
   }),
 
-  // Auth endpoints
+  // ======================================================
+  // Auth
+  // ======================================================
   http.post('/auth/register', async ({ request }) => {
     const { email, password, role } = await request.json() as any;
     if (!email || !password) return new HttpResponse(null, { status: 400 });
@@ -48,7 +53,9 @@ export const handlers = [
   // QUERY: Wallets
   // ======================================================
   graphql.query('Wallets', async () => {
-    await applyChaos();
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
+
     const result = getAllWallets().map((wallet) => ({
       id: wallet.id,
       label: wallet.label,
@@ -60,24 +67,21 @@ export const handlers = [
         currency: acc.currency,
         lastUpdated: new Date().toISOString(),
       })),
-    }))
+    }));
 
-    return HttpResponse.json({
-      data: { wallets: result },
-    })
+    return HttpResponse.json({ data: { wallets: result } });
   }),
 
   // ======================================================
   // QUERY: Accounts
   // ======================================================
   graphql.query('Accounts', async ({ variables }) => {
-    await applyChaos();
-    const { walletId } = variables as { walletId: string }
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
 
-    const wallet = getWalletById(walletId)
-    if (!wallet) {
-      return HttpResponse.json({ data: { accounts: [] } })
-    }
+    const { walletId } = variables as { walletId: string };
+    const wallet = getWalletById(walletId);
+    if (!wallet) return HttpResponse.json({ data: { accounts: [] } });
 
     return HttpResponse.json({
       data: {
@@ -90,178 +94,148 @@ export const handlers = [
           lastUpdated: new Date().toISOString(),
         })),
       },
-    })
+    });
   }),
 
   // ======================================================
   // QUERY: Transactions (cursor pagination)
   // ======================================================
   graphql.query('Transactions', async ({ variables }) => {
-    await applyChaos();
-    const { accountId, first = 10, after } = variables as {
-      accountId?: string
-      first?: number
-      after?: string
-    }
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
 
-    let filtered = [...ledger]
+    const { accountId, first = 10, after } = variables as {
+      accountId?: string;
+      first?: number;
+      after?: string;
+    };
+
+    let filtered = [...ledger];
 
     if (accountId) {
       filtered = filtered.filter(
-        (t) =>
-          t.sourceAccountId === accountId ||
-          t.destinationAccountId === accountId,
-      )
+        (t) => t.sourceAccountId === accountId || t.destinationAccountId === accountId,
+      );
     }
 
-    let startIndex = 0
-
+    let startIndex = 0;
     if (after) {
-      const idx = filtered.findIndex((t) => t.id === after)
-      if (idx >= 0) startIndex = idx + 1
+      const idx = filtered.findIndex((t) => t.id === after);
+      if (idx >= 0) startIndex = idx + 1;
     }
 
-    const sliced = filtered.slice(startIndex, startIndex + first)
+    const sliced = filtered.slice(startIndex, startIndex + first);
 
     return HttpResponse.json({
       data: {
         transactions: {
-          edges: sliced.map((t) => ({
-            node: t,
-            cursor: t.id,
-          })),
+          totalCount: filtered.length,
+          edges: sliced.map((t) => ({ node: t, cursor: t.id })),
           pageInfo: {
             hasNextPage: startIndex + first < filtered.length,
             endCursor: sliced.length ? sliced[sliced.length - 1].id : null,
           },
         },
       },
-    })
+    });
   }),
 
   // ======================================================
   // QUERY: Balance History
   // ======================================================
   graphql.query('BalanceHistory', async ({ variables }) => {
-    await applyChaos();
-    const { walletId } = variables as { walletId: string }
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
 
+    const { walletId } = variables as { walletId: string };
     return HttpResponse.json({
-      data: {
-        balanceHistory: computeBalanceHistory(walletId),
-      },
-    })
+      data: { balanceHistory: computeBalanceHistory(walletId) },
+    });
   }),
 
   // ======================================================
   // QUERY: Spending By Category
   // ======================================================
   graphql.query('SpendingByCategory', async ({ variables }) => {
-    await applyChaos();
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
+
     const { walletId, startDate, endDate } = variables as {
-      walletId: string
-      startDate: string
-      endDate: string
-    }
+      walletId: string;
+      startDate: string;
+      endDate: string;
+    };
 
     return HttpResponse.json({
-      data: {
-        spendingByCategory: computeSpendingByCategory(
-          walletId,
-          startDate,
-          endDate,
-        ),
-      },
-    })
+      data: { spendingByCategory: computeSpendingByCategory(walletId, startDate, endDate) },
+    });
   }),
 
   // ======================================================
   // MUTATION: Create Wallet
   // ======================================================
   graphql.mutation('CreateWallet', async ({ variables }) => {
-    await applyChaos();
-    const { label } = variables as { label: string }
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
+
+    const { label } = variables as { label: string };
 
     const newWallet: WalletDef = {
       id: `w${Date.now()}`,
       userId: 'u1',
       label,
       accounts: [],
-    }
+    };
 
-    // Write through the single wallet registry.
-    // addWallet() updates walletsByUser, so every subsequent read
-    // — wallets query, balance history, spending chart — will find it.
-    addWallet('u1', newWallet)
+    addWallet('u1', newWallet);
 
-    return HttpResponse.json({
-      data: {
-        createWallet: newWallet,
-      },
-    })
+    return HttpResponse.json({ data: { createWallet: newWallet } });
   }),
 
   // ======================================================
   // MUTATION: Transfer Funds
   // ======================================================
   graphql.mutation('TransferFunds', async ({ variables }) => {
-    await applyChaos();
-    const {
-      fromAccountId,
-      toAccountId,
-      amount,
-      idempotencyKey,
-    } = variables as {
-      fromAccountId: string
-      toAccountId: string
-      amount: number
-      idempotencyKey: string
-    }
+    const chaos = await applyChaos();
+    if (chaos) return chaos;
+
+    const { fromAccountId, toAccountId, amount, idempotencyKey } = variables as {
+      fromAccountId: string;
+      toAccountId: string;
+      amount: number;
+      idempotencyKey: string;
+    };
 
     if (idempotencyStore.has(idempotencyKey)) {
-      return HttpResponse.json({
-        data: {
-          transferFunds: idempotencyStore.get(idempotencyKey),
-        },
-      })
+      return HttpResponse.json({ data: { transferFunds: idempotencyStore.get(idempotencyKey) } });
     }
 
-    const fromAccount = getAccountById(fromAccountId)
-    const toAccount   = getAccountById(toAccountId)
+    const fromAccount = getAccountById(fromAccountId);
+    const toAccount   = getAccountById(toAccountId);
 
     if (!fromAccount || !toAccount) {
-      const res = { success: false, transaction: null }
-
-      idempotencyStore.set(idempotencyKey, res)
-
-      return HttpResponse.json({
-        data: { transferFunds: res },
-      })
+      const res = { success: false, transaction: null };
+      idempotencyStore.set(idempotencyKey, res);
+      return HttpResponse.json({ data: { transferFunds: res } });
     }
 
     const newTransaction: LedgerEntry = {
-      id: `t${Date.now()}`,
+      id:                   `t${Date.now()}`,
       amount,
-      currency: fromAccount.currency,
-      type: 'TRANSFER',
-      description: `Transfer to ${toAccount.name}`,
-      createdAt: new Date().toISOString(),
-      sourceAccountId: fromAccountId,
+      currency:             fromAccount.currency,
+      type:                 'TRANSFER',
+      description:          `Transfer to ${toAccount.name}`,
+      createdAt:            new Date().toISOString(),
+      sourceAccountId:      fromAccountId,
       destinationAccountId: toAccountId,
-      category: 'Transfer',
-    }
+      category:             'Transfer',
+    };
 
-    ledger.unshift(newTransaction)
+    ledger.unshift(newTransaction);
 
-    const res = {
-      success: true,
-      transaction: newTransaction,
-    }
+    const res = { success: true, transaction: newTransaction };
+    idempotencyStore.set(idempotencyKey, res);
 
-    idempotencyStore.set(idempotencyKey, res)
-
-    return HttpResponse.json({
-      data: { transferFunds: res },
-    })
+    return HttpResponse.json({ data: { transferFunds: res } });
   }),
-]
+];
