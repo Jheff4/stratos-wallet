@@ -35,6 +35,13 @@ const config: CodegenConfig = {
         exposeQueryKeys: true,
         exposeFetcher: true,
         useTypeImports: true,
+        // Type every generated query/mutation error as `Error`, not the
+        // default `unknown`. Without this, `useXQuery().error` is `unknown`,
+        // which (a) forces an `as Error` cast at every error-handling site and
+        // (b) silently poisons JSX: `unknown && <div/>` evaluates to `unknown`,
+        // which is not a valid ReactNode. One config line fixes error typing
+        // across every feature instead of per-call casts.
+        errorType: 'Error',
       },
     },
   },

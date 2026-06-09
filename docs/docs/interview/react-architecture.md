@@ -171,6 +171,27 @@ A user starts a transfer, navigates away before it resolves, and comes back. If 
 
 </div>
 
+---
+
+## How do you type errors from data-fetching hooks?
+
+<span class="diff diff--staff">Staff</span>
+
+<div class="interview-q">Your generated query hooks type <code>.error</code> as <code>unknown</code> by default. A teammate fixes the resulting compile errors by writing <code>error as Error</code> at each call site. Why is that the wrong fix, and what would you do instead?</div>
+
+<div class="interview-a">
+
+`error as Error` is a **type assertion, not a check** — it switches the compiler off without any runtime proof. The day something throws a non-`Error` (a GraphQL error array, a string from a third-party SDK), the cast still compiles and `.message` is `undefined` at runtime. It hides the bug instead of fixing it. It also doesn't scale: every new hook needs the developer to *remember* the cast, and a forgotten one silently breaks rendering — `unknown && <ErrorCard/>` evaluates to `unknown`, which is not a valid `ReactNode`.
+
+I'd fix it in two coordinated places — the two halves of an honest guarantee:
+
+1. **Declare the type at the generator.** The hooks are generated, so I set `errorType: 'Error'` in `codegen.ts`. Every current and future hook is typed `TError = Error` from one line — new integrations (Paystack, Mono, Dojah) inherit it automatically.
+2. **Guarantee it at the fetcher boundary.** Declaring `Error` is a claim the type system can't verify on its own, so the fetcher must *make it true*: every failure path throws `new Error(...)`. Now the type and the runtime agree.
+
+The principle: when the same type problem repeats across many generated call sites, fix the generator and the boundary that produces the values — not each consumer. A cast has neither half; it just relocates the risk to runtime.
+
+</div>
+
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>

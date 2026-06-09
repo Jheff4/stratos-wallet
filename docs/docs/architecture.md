@@ -125,6 +125,32 @@ type Account {
 
 ---
 
+## Type Safety
+
+### Strict mode is the floor, not a nice-to-have
+
+The project compiles under `"strict": true`. That umbrella flag turns on `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, `useUnknownInCatchVariables`, and more. For a money app the headline one is `strictNullChecks`: without it, `null` and `undefined` are silent members of every type, so `account.balance.toFixed(2)` compiles even when the account hasn't loaded — then throws `Cannot read properties of undefined` at runtime, on a balance view, in front of a user. Strict mode turns that class of bug into a compile error you must handle.
+
+### Errors are `unknown` until proven otherwise
+
+Two related decisions enforce honest error handling:
+
+1. **Error boundaries receive `unknown`, not `Error`.** In JavaScript you can `throw` anything — a string, an object, `undefined`. The `ErrorFallback` component types its `error` prop as `unknown` and narrows it through a single `toMessage()` choke point (`error instanceof Error ? error.message : String(error)`). The UI never assumes a shape it cannot prove.
+
+2. **GraphQL hook errors are typed at the codegen layer.** By default `typescript-react-query` types `useXQuery().error` as `unknown`. That doesn't just force an `as Error` cast at every call site — it silently poisons JSX, because `unknown && <div/>` evaluates to `unknown`, which is not a valid `ReactNode`. Setting `errorType: 'Error'` in `codegen.ts` fixes error typing across *every* generated hook from one config line:
+
+```ts
+// codegen.ts
+config: {
+  reactQueryVersion: 5,
+  errorType: 'Error', // every query/mutation .error is typed Error, not unknown
+}
+```
+
+The lesson: when a type problem repeats across features, fix the generator, not each call site. That is the difference between patching symptoms and fixing the contract.
+
+---
+
 ## Ledger as Source of Truth
 
 ### The financial realism argument

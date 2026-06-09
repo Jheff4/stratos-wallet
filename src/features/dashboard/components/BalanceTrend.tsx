@@ -1,7 +1,7 @@
 import { useBalanceHistoryQuery } from '@graphql/generated';
 import WidgetSkeleton from '@shared/components/WidgetSkeleton';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Area, AreaChart,
 } from 'recharts';
 

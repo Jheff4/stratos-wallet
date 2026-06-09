@@ -78,6 +78,15 @@ const sidebars: SidebarsConfig = {
           collapsed: false,
           items: [
             'stories/nates-messy-flat',
+            'stories/the-error-at-the-wrong-line',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Resilience & Tooling',
+          collapsed: false,
+          items: [
+            'stories/the-chaos-that-wouldnt-happen',
           ],
         },
       ],
@@ -95,6 +104,24 @@ const sidebars: SidebarsConfig = {
         'interview/real-time',
         'interview/react-architecture',
         'interview/behavioural',
+      ],
+    },
+
+    // ── Quizzes ────────────────────────────────────────────────
+    {
+      type: 'category',
+      label: 'Quizzes',
+      collapsed: false,
+      items: [
+        'quiz/index',
+        'quiz/architecture',
+        'quiz/data-model',
+        'quiz/state-management',
+        'quiz/real-time',
+        'quiz/resilience',
+        'quiz/observability',
+        'quiz/mocking-and-data-flow',
+        'quiz/type-safety',
       ],
     },
   ],

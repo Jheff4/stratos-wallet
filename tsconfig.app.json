@@ -22,6 +22,16 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Type safety —
+       `strict` is the umbrella flag that turns on strictNullChecks,
+       noImplicitAny, strictFunctionTypes, strictBindCallApply,
+       strictPropertyInitialization, alwaysStrict, and
+       useUnknownInCatchVariables. For a money app the headline one is
+       strictNullChecks: it stops `null`/`undefined` from silently being
+       members of every type, so a not-yet-loaded balance can't slip a
+       runtime "Cannot read properties of undefined" into a balance view. */
+    "strict": true,
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

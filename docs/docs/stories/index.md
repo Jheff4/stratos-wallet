@@ -55,6 +55,17 @@ The characters here are fictional. The failure modes are not.
 | Story | What breaks without it |
 |---|---|
 | [Nate's Messy Flat](./nates-messy-flat) | File-type organisation: to change one feature, touch four directories. Vertical slices: change one folder. |
+| [The Error at the Wrong Line](./the-error-at-the-wrong-line) | A compiler error blamed on the wrong line; an `unknown` error type poisons JSX. Fixed at the generator, not with per-call casts. |
+
+---
+
+## Resilience & Tooling
+
+*The fake backend, the failure valve, and the seams between worlds.*
+
+| Story | What breaks without it |
+|---|---|
+| [The Chaos That Wouldn't Happen](./the-chaos-that-wouldnt-happen) | A chaos toggle that changes nothing — config lives in two execution contexts and silently drifts. One source of truth, pushed across the boundary. |
 
 ---
 

@@ -40,7 +40,12 @@ export function updateChaosConfig(newConfig: Partial<ChaosConfig>) {
  *   const chaos = await applyChaos();
  *   if (chaos) return chaos;
  */
-export async function applyChaos(): Promise<HttpResponse | null> {
+// Return type is `Response | null`, not `HttpResponse` — MSW's HttpResponse is
+// generic over its body type (HttpResponse<BodyType>), and applyChaos returns
+// several different bodies (JSON error payloads, an empty 503). `Response` is
+// their honest common supertype (HttpResponse extends Response), so callers stay
+// type-safe without us inventing a fake unified body type.
+export async function applyChaos(): Promise<Response | null> {
   const { latencyMin, latencyMax, errorRate, messageDropRate, partialResponseRate } = config;
 
   // 1. Simulated network latency

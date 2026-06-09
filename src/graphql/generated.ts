@@ -105,7 +105,7 @@ export const AccountsDocument = new TypedDocumentString(`
 
 export const useAccountsQuery = <
       TData = AccountsQuery,
-      TError = unknown
+      TError = Error
     >(
       variables: AccountsQueryVariables,
       options?: Omit<UseQueryOptions<AccountsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AccountsQuery, TError, TData>['queryKey'] }
@@ -135,7 +135,7 @@ export const BalanceHistoryDocument = new TypedDocumentString(`
 
 export const useBalanceHistoryQuery = <
       TData = BalanceHistoryQuery,
-      TError = unknown
+      TError = Error
     >(
       variables: BalanceHistoryQueryVariables,
       options?: Omit<UseQueryOptions<BalanceHistoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<BalanceHistoryQuery, TError, TData>['queryKey'] }
@@ -169,7 +169,7 @@ export const SpendingByCategoryDocument = new TypedDocumentString(`
 
 export const useSpendingByCategoryQuery = <
       TData = SpendingByCategoryQuery,
-      TError = unknown
+      TError = Error
     >(
       variables: SpendingByCategoryQueryVariables,
       options?: Omit<UseQueryOptions<SpendingByCategoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SpendingByCategoryQuery, TError, TData>['queryKey'] }
@@ -214,7 +214,7 @@ export const TransactionsDocument = new TypedDocumentString(`
 
 export const useTransactionsQuery = <
       TData = TransactionsQuery,
-      TError = unknown
+      TError = Error
     >(
       variables?: TransactionsQueryVariables,
       options?: Omit<UseQueryOptions<TransactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TransactionsQuery, TError, TData>['queryKey'] }
@@ -253,7 +253,7 @@ export const TransferFundsDocument = new TypedDocumentString(`
     `);
 
 export const useTransferFundsMutation = <
-      TError = unknown,
+      TError = Error,
       TContext = unknown
     >(options?: UseMutationOptions<TransferFundsMutation, TError, TransferFundsMutationVariables, TContext>) => {
     
@@ -287,7 +287,7 @@ export const WalletsDocument = new TypedDocumentString(`
 
 export const useWalletsQuery = <
       TData = WalletsQuery,
-      TError = unknown
+      TError = Error
     >(
       variables?: WalletsQueryVariables,
       options?: Omit<UseQueryOptions<WalletsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WalletsQuery, TError, TData>['queryKey'] }
@@ -316,7 +316,7 @@ export const CreateWalletDocument = new TypedDocumentString(`
     `);
 
 export const useCreateWalletMutation = <
-      TError = unknown,
+      TError = Error,
       TContext = unknown
     >(options?: UseMutationOptions<CreateWalletMutation, TError, CreateWalletMutationVariables, TContext>) => {
     

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { formatCurrency } from '@shared/utils/formatters';
 

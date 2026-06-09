@@ -230,6 +230,36 @@ Don't test implementation details — test observable behaviour. The test for de
 
 </div>
 
+---
+
+## How do you build and test a frontend before the backend exists?
+
+<div class="interview-q">You're hired to build a fintech dashboard but the backend team is months behind. How do you build real features — including failure handling — without a server?</div>
+
+<div class="interview-a">
+
+I mock at the **network layer**, not in the app. Using MSW (Mock Service Worker), a Service Worker intercepts the app's real `fetch` calls and answers them. The crucial property: the app makes genuine HTTP requests and has no idea the backend is fake. Components, hooks, and the fetcher are identical to what ships — when the real server arrives, I change zero lines above the network boundary.
+
+That rules out the alternatives I'd reject in the interview: stubbing the fetch function or mocking data modules leaves mock-shaped seams *inside* the app and tests a different code path than production. Network interception tests the real path.
+
+On top of the mock backend I add a **failure-injection layer**. Every mock resolver begins with the same guard — `const chaos = await applyChaos(); if (chaos) return chaos;` — so a single, uniform splice point makes *every* endpoint able to return latency, a 500, a dropped 503, or a partial 206 on demand, controlled from a dev console. And the injected failures are shaped like real ones (a 500 carrying a GraphQL `errors` body, a 503 with no body) so they exercise the exact branches my error handling must survive. The result: I build every loading, empty, error, and partial state *while the failure is actively happening*, instead of discovering them in production.
+
+</div>
+
+## Walk me through what happens when a component requests data
+
+<div class="interview-q">A component calls a data hook and renders a balance. Trace the full path, and tell me where the two most important decisions are made.</div>
+
+<div class="interview-a">
+
+The hook computes a **cache key** (e.g. `['Accounts', { walletId }]`) and asks React Query for it. **Decision one — the cache check:** if a fresh entry exists (within `staleTime`), it's returned with no network call at all. Most invocations stop here; calling a hook is *subscribing to a cache key*, not firing a request.
+
+On a miss, the `queryFn` runs the fetcher, which makes a real `POST /graphql`. MSW intercepts it and matches a handler. **Decision two — the chaos gate:** the handler runs `applyChaos()` first, which can delay or short-circuit with a failure before any real work. If it passes, the handler reads the fake DB and **derives** the balance from the ledger (`computeBalance`) rather than reading a stored field. The JSON returns through the fetcher, which checks `json.errors` and either throws an `Error` (→ React Query `error` state → error boundary) or returns `data`. React Query caches it under the key, marks it fresh, and the component renders.
+
+So the two decisions that govern everything are *cache freshness* (does a request even happen?) and *the chaos gate* (does this request fail?). Naming those two unprompted is what shows you actually understand the data flow rather than reciting "the hook fetches data."
+
+</div>
+
 <div class="stratos-related">
 <h4>Related in this project</h4>
 <ul>

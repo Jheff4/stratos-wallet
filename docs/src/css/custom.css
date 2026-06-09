@@ -1050,55 +1050,30 @@ div[class*='tableWrapper'] {
 }
 
 /* ============================================================
-   MOBILE SIDEBAR — dark panel, matches the main app
-   Override Infima CSS variables so the cascade handles
-   menu link colors automatically — no specificity fights.
+   MOBILE SIDEBAR
+   Structural styling applies in both themes. Colours follow the
+   active theme: light mode stays light (Infima defaults + tokens),
+   dark mode gets the navy treatment that matches the main app.
    ============================================================ */
 
 @media (max-width: 996px) {
-  /* Sidebar panel — dark navy, always (matches the main app) */
-  .navbar-sidebar {
-    /* Override Infima's menu CSS vars so all links cascade correctly */
-    --ifm-menu-color:                    #94a3b8;
-    --ifm-menu-color-active:             #c7d2fe;
-    --ifm-menu-color-background-active:  rgba(79, 110, 247, 0.18);
-    --ifm-menu-color-background-hover:   rgba(255, 255, 255, 0.06);
-    --ifm-navbar-background-color:       #0f172a;
-    --ifm-navbar-link-color:             #94a3b8;
-
-    background-color: #0f172a;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  /* Brand row */
+  /* ---- Structural / theme-agnostic ---- */
   .navbar-sidebar__brand {
-    background-color: #0f172a;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid var(--stratos-border-light);
   }
 
-  /* Items container and each panel — transparent so sidebar bg shows */
-  .navbar-sidebar__items,
-  .navbar-sidebar__item {
-    background-color: transparent;
-  }
+  .navbar-sidebar .navbar__logo { height: 26px; width: 26px; }
 
-  /* Logo + title */
-  .navbar-sidebar .navbar__title { color: #e2e8f0; }
-  .navbar-sidebar .navbar__logo  { height: 26px; width: 26px; }
+  .navbar-sidebar__close { color: var(--stratos-ink-400); }
+  .navbar-sidebar__close:hover { color: var(--stratos-ink-600); }
 
-  /* Close button */
-  .navbar-sidebar__close { color: #64748b; }
-  .navbar-sidebar__close:hover { color: #e2e8f0; }
+  .navbar-sidebar__backdrop { background-color: rgba(0, 0, 0, 0.5); }
 
-  /* Backdrop */
-  .navbar-sidebar__backdrop { background-color: rgba(0, 0, 0, 0.6); }
-
-  /* Menu item padding */
   .navbar-sidebar__item.menu { padding: 8px 10px; }
 
   /* Category labels — small-caps above groups */
   .navbar-sidebar .menu__list-item-collapsible > .menu__link {
-    color: #475569 !important;
+    color: var(--stratos-ink-400) !important;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -1106,10 +1081,7 @@ div[class*='tableWrapper'] {
     background: transparent !important;
   }
 
-  /* Caret triangles */
-  .navbar-sidebar .menu__caret::before { border-color: #475569; }
-
-  /* All nav links — use normal sizes, Infima vars handle hover/active bg */
+  /* Nav links */
   .navbar-sidebar .menu__link {
     font-size: 13.5px;
     border-radius: 6px;
@@ -1119,15 +1091,54 @@ div[class*='tableWrapper'] {
   /* Nested list indent line */
   .navbar-sidebar .menu__list .menu__list {
     padding-left: 8px;
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    border-left: 1px solid var(--stratos-border-light);
     margin-left: 8px;
   }
 
   /* Scrollbar */
-  .navbar-sidebar::-webkit-scrollbar       { width: 4px; }
+  .navbar-sidebar::-webkit-scrollbar { width: 4px; }
   .navbar-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--stratos-border-medium);
     border-radius: 2px;
+  }
+
+  /* ---- Dark mode only: navy treatment (matches the main app) ---- */
+  [data-theme='dark'] .navbar-sidebar {
+    --ifm-menu-color:                    #94a3b8;
+    --ifm-menu-color-active:             #c7d2fe;
+    --ifm-menu-color-background-active:  rgba(79, 110, 247, 0.18);
+    --ifm-menu-color-background-hover:   rgba(255, 255, 255, 0.06);
+    --ifm-navbar-background-color:       #0f172a;
+    background-color: #0f172a;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  [data-theme='dark'] .navbar-sidebar__brand {
+    background-color: #0f172a;
+    border-bottom-color: rgba(255, 255, 255, 0.07);
+  }
+
+  [data-theme='dark'] .navbar-sidebar__items,
+  [data-theme='dark'] .navbar-sidebar__item {
+    background-color: transparent;
+  }
+
+  [data-theme='dark'] .navbar-sidebar .navbar__title { color: #e2e8f0; }
+  [data-theme='dark'] .navbar-sidebar__close { color: #64748b; }
+  [data-theme='dark'] .navbar-sidebar__close:hover { color: #e2e8f0; }
+
+  [data-theme='dark'] .navbar-sidebar .menu__list-item-collapsible > .menu__link {
+    color: #475569 !important;
+  }
+
+  [data-theme='dark'] .navbar-sidebar .menu__caret::before { border-color: #475569; }
+
+  [data-theme='dark'] .navbar-sidebar .menu__list .menu__list {
+    border-left-color: rgba(255, 255, 255, 0.06);
+  }
+
+  [data-theme='dark'] .navbar-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
   }
 }
 

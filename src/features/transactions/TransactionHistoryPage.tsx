@@ -46,7 +46,10 @@ export default function TransactionHistoryPage() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const allEdges = data?.pages.flatMap((page) => page?.transactions?.edges ?? []) ?? [];
-  const totalCount = data?.pages[0]?.transactions?.totalCount ?? 0;
+  // TODO(contract-first): `totalCount` is not in the GraphQL schema yet. Expose it
+  // properly via schema → query → mock resolver → codegen before showing a total.
+  // Until then we only know how many edges we've loaded, not the true total.
+  const loadedCount = allEdges.length;
 
   return (
     <>
@@ -54,7 +57,7 @@ export default function TransactionHistoryPage() {
         <h1 className="page-title">Transaction History</h1>
         <p className="page-subtitle">
           {accountId ? `Filtered by account ${accountId}` : 'All recent activity'}
-          {totalCount > 0 ? ` · ${totalCount.toLocaleString()} transactions` : ''}
+          {loadedCount > 0 ? ` · ${loadedCount.toLocaleString()} loaded` : ''}
         </p>
       </div>
 
