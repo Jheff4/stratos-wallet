@@ -6,7 +6,7 @@
 
 established WebSocket as the real-time transport. The initial `useWebSocket` implementation handled reconnection and chaos simulation, but lacked protocol-level reliability:
 
-1. **No event deduplication.** When `duplicateWsEvents` chaos was enabled, the hook delivered both the original event and the duplicate — doubling every transaction in the feed and corrupting the balance display.
+1. **No event deduplication.** When `duplicateWsEvents` chaos was enabled, the hook delivered both the original event and the duplicate, doubling every transaction in the feed and corrupting the balance display.
 
 2. **No sequence number tracking.** After a reconnect, the client had no way to know how many events it missed or to request them be replayed. Disconnections silently dropped real-time updates.
 
@@ -26,7 +26,7 @@ Upgrade both the WebSocket server and the client hook to implement a full reliab
 
 1. **Global sequence counter.** Every event gets `seq: ++globalSeq`. The counter is monotonically increasing for the server's lifetime.
 
-2. **Unique event IDs.** Every event gets `eventId: crypto.randomUUID()`. Stable per emission — replays carry the same `eventId` as the original, enabling idempotent processing.
+2. **Unique event IDs.** Every event gets `eventId: crypto.randomUUID()`. Stable per emission: replays carry the same `eventId` as the original, enabling idempotent processing.
 
 3. **Event buffer.** Last 200 events are retained in a ring buffer. Oldest events are evicted when the buffer is full.
 
@@ -34,7 +34,7 @@ Upgrade both the WebSocket server and the client hook to implement a full reliab
    - Find all buffered events with `seq > N`.
    - Send them in order with `replayed: true`.
    - Send `replay_complete` when finished.
-   - If `N` is older than the oldest buffered event, send `replay_overflow` instead — the client must do a full refetch.
+   - If `N` is older than the oldest buffered event, send `replay_overflow` instead: the client must do a full refetch.
 
 5. **`currentSeq` in welcome message.** The `connected` message includes the server's current sequence so clients know where the stream starts.
 
@@ -51,10 +51,10 @@ sequenceDiagram
   S->>C: {seq:41, eventId:"abc-1", type:"new_transaction"}
   C->>C: lastSeq=41, seenIds.add("abc-1")
 
-  Note over C,S: Connection drops — events keep flowing
+  Note over C,S: Connection drops, events keep flowing
   S->>B: buffer {seq:42, eventId:"def-2"}
   S->>B: buffer {seq:43, eventId:"ghi-3"}
-  Note over C: Client offline — events 42 & 43 missed
+  Note over C: Client offline: events 42 & 43 missed
 
   Note over C,S: Reconnect + replay
   C->>S: {type:"subscribe", lastSeq:41}
@@ -64,7 +64,7 @@ sequenceDiagram
   S->>C: {type:"replay_complete", replayedCount:2, currentSeq:43}
   C->>C: process replayed events, lastSeq=43
 
-  Note over C,S: Deduplication — at-least-once scenario
+  Note over C,S: Deduplication, at-least-once scenario
   S->>C: {seq:44, eventId:"jkl-4"} resent due to network retry
   C->>C: seenIds.has("jkl-4") → true → DISCARD
 ```
@@ -99,7 +99,7 @@ A Map would let us store arrival timestamps for TTL-based eviction ("forget even
 
 ### Why `seq` and `eventId` as separate fields?
 
-They solve different problems. `seq` detects gaps — if you see 41 then 43, you know 42 is missing. `eventId` deduplicates — two deliveries of the same event have the same `eventId` regardless of when they arrive.
+They solve different problems. `seq` detects gaps: if you see 41 then 43, you know 42 is missing. `eventId` deduplicates: two deliveries of the same event have the same `eventId` regardless of when they arrive.
 
 You cannot use `seq` for deduplication: a replayed event arrives with its original `seq`, which the client may have already seen and tracked as `lastSeq`. The client needs to know "this is the same event I processed before, not a gap in the sequence."
 
@@ -136,7 +136,7 @@ This pattern is used by AWS SDKs, Stripe's client libraries, and virtually every
 
 **Positive:**
 - Duplicate events from at-least-once delivery are silently discarded.
-- Short disconnections are transparent to the user — events are replayed automatically.
+- Short disconnections are transparent to the user: events are replayed automatically.
 - Sequence gaps are logged, making debugging much easier in production.
 - UI can show accurate connection status without reimplementing tracking.
 
@@ -156,9 +156,9 @@ This pattern is used by AWS SDKs, Stripe's client libraries, and virtually every
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/azeez-in-the-tunnel">Azeez in the Tunnel — sequence numbers & replay</a></li>
-<li><a href="../stories/jons-duplicate-feed">Jon's Duplicate Feed — deduplication</a></li>
-<li><a href="../stories/the-reconnect-storm">The Reconnect Storm — exponential backoff</a></li>
+<li><a href="../stories/azeez-in-the-tunnel">Azeez in the Tunnel: sequence numbers & replay</a></li>
+<li><a href="../stories/jons-duplicate-feed">Jon's Duplicate Feed: deduplication</a></li>
+<li><a href="../stories/the-reconnect-storm">The Reconnect Storm: exponential backoff</a></li>
 </ul>
 </div>
 
@@ -166,7 +166,7 @@ This pattern is used by AWS SDKs, Stripe's client libraries, and virtually every
 <h4>Interview Prep</h4>
 <ul>
 <li><a href="../interview/real-time">Real-Time Systems Questions</a></li>
-<li><a href="../interview/system-design">System Design — design a real-time balance system</a></li>
+<li><a href="../interview/system-design">System Design: design a real-time balance system</a></li>
 </ul>
 </div>
 

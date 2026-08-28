@@ -51,6 +51,7 @@ const sidebars: SidebarsConfig = {
             'stories/nates-missing-thousands',
             'stories/two-filing-cabinets',
             'stories/sams-invisible-bug',
+            'stories/the-feed-that-lied',
           ],
         },
         {

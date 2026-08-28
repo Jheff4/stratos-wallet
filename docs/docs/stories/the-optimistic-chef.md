@@ -16,7 +16,7 @@ In app B, the moment she taps, the UI switches to the order confirmation screen.
 
 Both apps made the same network request to the same server. App B just didn't wait for the response before updating the UI.
 
-App B is *optimistic*. It assumes the request will succeed — because it usually does — and shows the result immediately. If the request fails, it reverses the change.
+App B is *optimistic*. It assumes the request will succeed, because it usually does, and shows the result immediately. If the request fails, it reverses the change.
 
 ---
 
@@ -44,7 +44,7 @@ The **optimistic chef** says: here's a receipt, your order is in, expected in ei
 
 Both chefs take exactly the same time. But the optimistic chef's customers leave happier.
 
-The rollback case: occasionally the market runs out of an ingredient. The optimistic chef calls you back and says "sorry, I can't make that today — here's a refund." That's the `onError` rollback. It happens rarely, and when it does, it's a minor inconvenience. The benefit across all the times it doesn't happen far outweighs the cost.
+The rollback case: occasionally the market runs out of an ingredient. The optimistic chef calls you back and says "sorry, I can't make that today, here's a refund." That's the `onError` rollback. It happens rarely, and when it does, it's a minor inconvenience. The benefit across all the times it doesn't happen far outweighs the cost.
 
 ---
 
@@ -57,11 +57,11 @@ useMutation({
   mutationFn: transferFunds,
 
   onMutate: async ({ fromAccountId, toAccountId, amount }) => {
-    // 1. Freeze any in-flight queries — we don't want them to
+    // 1. Freeze any in-flight queries: we don't want them to
     //    overwrite our optimistic update with stale server data
     await queryClient.cancelQueries({ queryKey: ['accounts'] });
 
-    // 2. Snapshot the current state — this is our "undo" save point
+    // 2. Snapshot the current state: this is our "undo" save point
     const snapshot = queryClient.getQueryData(['accounts', walletId]);
 
     // 3. Apply the expected result immediately
@@ -106,7 +106,7 @@ Three moments, each with a job:
 
 Some engineers avoid optimistic updates because they fear the rollback case. "What if it fails? The user saw a wrong balance."
 
-Think about it from the user's perspective. The balance showed ₦525,000 for half a second, then snapped back to ₦600,000 with an error toast: "Transfer failed — please try again."
+Think about it from the user's perspective. The balance showed ₦525,000 for half a second, then snapped back to ₦600,000 with an error toast: "Transfer failed, please try again."
 
 Is that bad? It's a small visual correction. Compare it to the alternative: the user stared at a spinner for two seconds before being told the transfer failed. Same outcome, worse experience.
 
@@ -120,7 +120,7 @@ The rollback is not a problem to avoid. It is a feature. It means the UI is hone
 
 Why refetch after success? Because the optimistic update was a guess. You guessed the balance would be `600,000 - 75,000 = 525,000`. The server might have applied a fee, a rounding adjustment, or a daily limit that changes the actual result. The refetch replaces your guess with the truth.
 
-Skip this and your UI will sometimes show a slightly wrong balance that never corrects itself — because the optimistic value sits in the cache indefinitely, never challenged.
+Skip this and your UI will sometimes show a slightly wrong balance that never corrects itself, because the optimistic value sits in the cache indefinitely, never challenged.
 
 ---
 
@@ -145,6 +145,6 @@ Done correctly, they make an application feel like it's running locally. Done in
 <div class="stratos-related">
 <h4>Related Stories</h4>
 <ul>
-<li><a href="./sams-double-transfer">Sam's Double Transfer — protecting the mutation itself</a></li>
+<li><a href="./sams-double-transfer">Sam's Double Transfer: protecting the mutation itself</a></li>
 </ul>
 </div>

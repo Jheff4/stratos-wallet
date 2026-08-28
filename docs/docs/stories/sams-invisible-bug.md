@@ -18,7 +18,7 @@ For a new user with 20 entries, this takes a fraction of a millisecond.
 
 For the power users who joined three years ago and make five transactions a day, this means scanning over 5,000 entries. Every. Single. Time. The balance is requested.
 
-The startup's most loyal, most active users — the ones responsible for the most revenue — are getting the worst experience.
+The startup's most loyal, most active users (the ones responsible for the most revenue) are getting the worst experience.
 
 Sam runs a quick calculation:
 
@@ -45,14 +45,14 @@ A snapshot is a saved result of `computeBalance()` at a specific point in time. 
 
 ```
 // Before snapshots: scan everything, every time
-computeBalance(allEntries)                        // O(n) — 5,000 entries scanned
+computeBalance(allEntries)                        // O(n): 5,000 entries scanned
 
 // After snapshots: scan only recent entries
-computeBalanceFromSnapshot(snapshot, recentEntries)  // O(k) — maybe 50 entries scanned
+computeBalanceFromSnapshot(snapshot, recentEntries)  // O(k): maybe 50 entries scanned
 ```
 
-`n` was the total number of entries — growing with every transaction, forever.  
-`k` is the number of entries since the last snapshot — bounded by how often you take snapshots.
+`n` was the total number of entries: growing with every transaction, forever.  
+`k` is the number of entries since the last snapshot: bounded by how often you take snapshots.
 
 If Sam takes a daily midnight snapshot, `k` is at most the number of transactions in the last 24 hours. For even the most active user, that's maybe 10–20 entries. Not 5,000.
 
@@ -94,7 +94,7 @@ The ledger is still append-only. Every transaction still creates a `LedgerEntry`
 
 The snapshot is a read optimisation, not a new source of truth. It's the ledger saying: "as of midnight, we had computed up to this point and the result was $4,230. You only need to scan what happened after that."
 
-If a snapshot is ever wrong — due to a bug in the snapshot job, a clock error, anything — you throw it away and recompute from the full ledger. The ledger is always there. The snapshot is a convenience.
+If a snapshot is ever wrong (due to a bug in the snapshot job, a clock error, anything) you throw it away and recompute from the full ledger. The ledger is always there. The snapshot is a convenience.
 
 ---
 
@@ -102,7 +102,7 @@ If a snapshot is ever wrong — due to a bug in the snapshot job, a clock error,
 
 A physical dictionary is 1,400 pages. Finding a word means reading 1,400 pages.
 
-But nobody does that. They open to roughly the right section using the tabs on the edge. "D" starts around page 280. They've effectively skipped to a snapshot — a saved position in the book.
+But nobody does that. They open to roughly the right section using the tabs on the edge. "D" starts around page 280. They've effectively skipped to a snapshot: a saved position in the book.
 
 They then scan 30 pages instead of 1,400.
 
@@ -114,21 +114,21 @@ Snapshots are the tabs on your ledger.
 
 ## What Sam builds at Stratos Wallet scale
 
-For Stratos Wallet today, none of this is necessary. Demo accounts have dozens of entries. `O(n)` at that scale is imperceptible — single-digit milliseconds.
+For Stratos Wallet today, none of this is necessary. Demo accounts have dozens of entries. `O(n)` at that scale is imperceptible: single-digit milliseconds.
 
-But the code is designed so that adding snapshots later is an additive change, not a rewrite. The ledger stays untouched. `computeBalance()` stays the same — it's just called with a shorter slice of entries starting from the snapshot rather than from the beginning.
+But the code is designed so that adding snapshots later is an additive change, not a rewrite. The ledger stays untouched. `computeBalance()` stays the same: it's just called with a shorter slice of entries starting from the snapshot rather than from the beginning.
 
 The architectural understanding to carry forward:
 
-1. **Today:** `computeBalance(allEntries)` — correct, simple, fast enough at this scale.
-2. **At scale:** `computeBalanceFromSnapshot(snapshot, recentEntries)` — same logic, different starting point.
-3. **Never:** store the balance as a mutable field — that's the path that leads to Sam's competitor's 6-hour freeze and three regulatory inquiries.
+1. **Today:** `computeBalance(allEntries)`: correct, simple, fast enough at this scale.
+2. **At scale:** `computeBalanceFromSnapshot(snapshot, recentEntries)`: same logic, different starting point.
+3. **Never:** store the balance as a mutable field: that's the path that leads to Sam's competitor's 6-hour freeze and three regulatory inquiries.
 
 ---
 
 ## What this is really about
 
-`O(n)` is not a problem to fear — it is information. It tells you exactly where the cost is and exactly how it grows. When entries are 20, O(n) is nothing. When entries are 5,000, O(n) needs addressing. The solution — snapshots — is already implicit in the ledger-first design. You don't redesign the system. You add a checkpoint mechanism that lets you skip ahead.
+`O(n)` is not a problem to fear: it is information. It tells you exactly where the cost is and exactly how it grows. When entries are 20, O(n) is nothing. When entries are 5,000, O(n) needs addressing. The solution (snapshots) is already implicit in the ledger-first design. You don't redesign the system. You add a checkpoint mechanism that lets you skip ahead.
 
 Understanding this tradeoff and its evolution path is the difference between someone who says "ledger-first is better" and someone who can defend that choice all the way through a staff-level system design interview, including when an interviewer asks "but doesn't that make balance reads slow at scale?"
 
@@ -146,6 +146,6 @@ Understanding this tradeoff and its evolution path is the difference between som
 <div class="stratos-related">
 <h4>Related Stories</h4>
 <ul>
-<li><a href="./nates-missing-thousands">Nate's Missing Thousands — why the ledger is the right foundation</a></li>
+<li><a href="./nates-missing-thousands">Nate's Missing Thousands: why the ledger is the right foundation</a></li>
 </ul>
 </div>

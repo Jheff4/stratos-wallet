@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTransactionFeed } from './hooks/useTransactionFeed';
 import { formatCurrency } from '@shared/utils/formatters';
 import ErrorCard from '@shared/components/ErrorCard';
+import DemoBadge from '@shared/components/DemoBadge';
 
 // Transaction type → badge variant
 function txBadge(type: string) {
@@ -59,6 +60,10 @@ export default function TransactionHistoryPage() {
           {accountId ? `Filtered by account ${accountId}` : 'All recent activity'}
           {loadedCount > 0 ? ` · ${loadedCount.toLocaleString()} loaded` : ''}
         </p>
+        <DemoBadge concepts={[
+          { label: 'Cursor pagination & infinite scroll', path: '/adrs/api-technology' },
+          { label: 'Real-time writes join the ledger',     path: '/stories/the-feed-that-lied' },
+        ]} />
       </div>
 
       <div className="page-body">
@@ -66,7 +71,7 @@ export default function TransactionHistoryPage() {
           <div className="card-header">
             <div>
               <div className="card-title">All Transactions</div>
-              <div className="card-subtitle">Scroll to load more — new transactions arrive in real time</div>
+              <div className="card-subtitle">Scroll to load more · new transactions arrive in real time</div>
             </div>
           </div>
 

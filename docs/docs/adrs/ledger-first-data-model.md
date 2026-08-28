@@ -6,7 +6,7 @@
 
 Every financial application needs to display balances. The simplest approach is to store a `balance` column on the account record and update it with every transaction. This is what most demo projects do.
 
-The problem with stored balances in financial systems is not performance — it is **correctness and auditability**. A stored balance is a derived value being treated as a source of truth. When the balance and the transaction history disagree, there is no way to determine which is correct without an audit.
+The problem with stored balances in financial systems is not performance: it is **correctness and auditability**. A stored balance is a derived value being treated as a source of truth. When the balance and the transaction history disagree, there is no way to determine which is correct without an audit.
 
 Real banking systems, payment processors, and financial platforms do not store balances. They store every credit and debit, then compute the balance on demand. The balance is a projection, not a record.
 
@@ -16,17 +16,17 @@ Real banking systems, payment processors, and financial platforms do not store b
 
 <div class="stratos-compare">
 <div class="stratos-compare-bad">
-<div class="stratos-compare-label">⚠ Stored State — two independent writes</div>
+<div class="stratos-compare-label">⚠ Stored State: two independent writes</div>
 
 **accounts table**<br/>
 `id: acc_001 · balance: $700`<br/>
-mutable — overwritten each transaction
+mutable: overwritten each transaction
 
 ↕ *separate store*
 
 **transactions table**<br/>
 `id: txn_001 · amount: –$300`<br/>
-independent write — can fail separately
+independent write: can fail separately
 
 ---
 
@@ -35,7 +35,7 @@ balance $700 · history shows no debit<br/>
 *balance and history diverge permanently*
 </div>
 <div class="stratos-compare-good">
-<div class="stratos-compare-label">✓ Event Sourced — one source of truth</div>
+<div class="stratos-compare-label">✓ Event Sourced: one source of truth</div>
 
 **ledger_entries** · append-only · immutable<br/>
 `+$1,000 deposit 2024-01-01`<br/>
@@ -76,11 +76,11 @@ flowchart LR
   ledger -. "write new projection" .-> A
 ```
 
-<p class="diagram-caption">All views derive from the same immutable ledger. Adding a new view never changes the data — only the projection function.</p>
+<p class="diagram-caption">All views derive from the same immutable ledger. Adding a new view never changes the data, only the projection function.</p>
 
 ## Decision
 
-The single source of truth is an **append-only ledger of `LedgerEntry` records**. No financial value — balance, running total, or aggregate — is stored anywhere. Every value the UI displays is computed from the ledger at query time.
+The single source of truth is an **append-only ledger of `LedgerEntry` records**. No financial value (balance, running total, or aggregate) is stored anywhere. Every value the UI displays is computed from the ledger at query time.
 
 ```ts
 interface LedgerEntry {
@@ -133,18 +133,18 @@ This is **event sourcing** applied to the frontend data layer.
 In event sourcing:
 - The event log is the source of truth (append-only, immutable).
 - The current state is a projection (derived, recomputable, discardable).
-- New views of the data are new projections — they do not require schema migrations.
+- New views of the data are new projections: they do not require schema migrations.
 
 In Stratos Wallet:
 - The `ledger` array is the event log.
 - `computeBalance()`, `computeBalanceHistory()`, `computeSpendingByCategory()` are projections.
-- A new analytics feature (e.g., monthly cashflow) is a new projection function — the ledger does not change.
+- A new analytics feature (e.g., monthly cashflow) is a new projection function: the ledger does not change.
 
 ---
 
 ## Single wallet registry
 
-A related architectural decision: wallet and account definitions are stored in a single `Map<userId, WalletDef[]>`. There is no secondary array. Every read path — balance computation, balance history, spending breakdown, transfer validation — goes through the same Map.
+A related architectural decision: wallet and account definitions are stored in a single `Map<userId, WalletDef[]>`. There is no secondary array. Every read path (balance computation, balance history, spending breakdown, transfer validation) goes through the same Map.
 
 **Why this matters:** An earlier version had both a static `wallets` array (used by some functions) and the Map (used by others). Dynamic wallets (created after app startup) only appeared in the Map. Balance history searched the static array and returned empty results for all dynamic wallets. The fix was structural: remove the array entirely, so the class of bug is impossible.
 
@@ -163,7 +163,7 @@ interface Account {
 }
 ```
 
-**Why rejected:** Introduces a consistency problem — the balance field and the transaction history can disagree. Any bug in the update logic produces a silent incorrect balance. Rollback and recovery logic becomes significantly more complex.
+**Why rejected:** Introduces a consistency problem: the balance field and the transaction history can disagree. Any bug in the update logic produces a silent incorrect balance. Rollback and recovery logic becomes significantly more complex.
 
 ### Use a CQRS-style read model
 
@@ -182,14 +182,14 @@ Maintain the ledger as the write model and a pre-computed `AccountBalance` table
 
 **Positive:**
 - Any historical balance is reconstructable by replaying ledger entries up to a point in time.
-- New analytics features require writing a new projection — not migrating data.
+- New analytics features require writing a new projection, not migrating data.
 - Balance bugs are detectable: if the balance is wrong, the ledger entries explain why.
 - Rollback is free: reverting a transfer is appending a reversal entry, not mutating a stored value.
 
 **Negative:**
 - Every balance computation is O(n) in ledger entries per account.
 - For a production system with millions of entries, this requires periodic snapshotting.
-- The projection functions must be correct — a bug produces wrong balances for all users simultaneously.
+- The projection functions must be correct: a bug produces wrong balances for all users simultaneously.
 
 ---
 
@@ -197,18 +197,18 @@ Maintain the ledger as the write model and a pre-computed `AccountBalance` table
 
 > "How would you design a balance display that is always accurate, even under network failures and concurrent mutations?"
 
-The answer: "Derive the balance from the transaction log rather than storing it. Use optimistic updates for immediate UI feedback, but recompute from the authoritative ledger on every query. Use a WebSocket to push ledger events so the projection stays fresh. On reconnect, replay missed events using sequence numbers so the projection catches up without a full refetch. The balance the user sees is always provable — it is the sum of all credits minus all debits in the log."
+The answer: "Derive the balance from the transaction log rather than storing it. Use optimistic updates for immediate UI feedback, but recompute from the authoritative ledger on every query. Use a WebSocket to push ledger events so the projection stays fresh. On reconnect, replay missed events using sequence numbers so the projection catches up without a full refetch. The balance the user sees is always provable: it is the sum of all credits minus all debits in the log."
 
 > "What's the difference between your approach and a standard REST API with a balance field?"
 
-"A REST API with a stored balance couples the display to the storage layer. If the storage has a bug, the display has a bug, and there's no independent source of truth to compare against. A ledger-derived balance is independently verifiable: you can recompute it at any time and get the same answer. In regulated financial systems, this auditability is not optional — it is a legal requirement."
+"A REST API with a stored balance couples the display to the storage layer. If the storage has a bug, the display has a bug, and there's no independent source of truth to compare against. A ledger-derived balance is independently verifiable: you can recompute it at any time and get the same answer. In regulated financial systems, this auditability is not optional: it is a legal requirement."
 
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/nates-missing-thousands">Nate's Missing Thousands — the bug that can't be undone</a></li>
-<li><a href="../stories/sams-invisible-bug">Sam's Invisible Bug — when O(n) starts hurting</a></li>
-<li><a href="../stories/two-filing-cabinets">The Two Filing Cabinets — single data store</a></li>
+<li><a href="../stories/nates-missing-thousands">Nate's Missing Thousands: the bug that can't be undone</a></li>
+<li><a href="../stories/sams-invisible-bug">Sam's Invisible Bug: when O(n) starts hurting</a></li>
+<li><a href="../stories/two-filing-cabinets">The Two Filing Cabinets: single data store</a></li>
 </ul>
 </div>
 
@@ -217,7 +217,7 @@ The answer: "Derive the balance from the transaction log rather than storing it.
 <ul>
 <li><a href="../interview/data-and-state">Data & State Questions</a></li>
 <li><a href="../interview/system-design">System Design Questions</a></li>
-<li><a href="../interview/behavioural">Behavioural — "Tell me about a hard decision"</a></li>
+<li><a href="../interview/behavioural">Behavioural: "Tell me about a hard decision"</a></li>
 </ul>
 </div>
 

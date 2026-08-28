@@ -2,13 +2,13 @@
 sidebar_label: "Mocking & Data Flow"
 ---
 
-# Quiz — Mocking & Data Flow
+# Quiz: Mocking & Data Flow
 
 Covers MSW network interception, the request lifecycle, cache-first reads, and how chaos splices into every endpoint. Reference: [ADR: Failure Simulation](../adrs/failure-simulation) · [ADR: API Technology](../adrs/api-technology).
 
 ---
 
-## Question 1 — Why intercept at the network layer
+## Question 1: Why intercept at the network layer
 
 <span class="diff diff--senior">Senior</span>
 
@@ -19,16 +19,16 @@ Covers MSW network interception, the request lifecycle, cache-first reads, and h
 
 <div class="interview-a">
 
-Because the app makes **genuine** HTTP requests — it doesn't know the backend is fake. MSW catches the request at the network boundary and answers it. Nothing in the component, hook, or fetcher is aware a mock exists.
+Because the app makes **genuine** HTTP requests: it doesn't know the backend is fake. MSW catches the request at the network boundary and answers it. Nothing in the component, hook, or fetcher is aware a mock exists.
 
-The payoff: the same code that runs in development against MSW runs in production against the real server. Swapping the backend in changes **zero** lines above the network boundary. Compare that to mocking the fetch function or stubbing modules — those leave mock-shaped seams *inside* your app that you have to unpick later, and they test a different code path than the one you ship. Network-level interception means dev and prod exercise the identical request path.
+The payoff: the same code that runs in development against MSW runs in production against the real server. Swapping the backend in changes **zero** lines above the network boundary. Compare that to mocking the fetch function or stubbing modules: those leave mock-shaped seams *inside* your app that you have to unpick later, and they test a different code path than the one you ship. Network-level interception means dev and prod exercise the identical request path.
 
 </div>
 </details>
 
 ---
 
-## Question 2 — Why most "requests" never leave the app
+## Question 2: Why most "requests" never leave the app
 
 <span class="diff diff--senior">Senior</span>
 
@@ -41,14 +41,14 @@ The payoff: the same code that runs in development against MSW runs in productio
 
 Usually **one**. React Query is a cache first and a fetcher second. The first call computes the key `['Accounts', { walletId }]`, fetches, and stores the result marked *fresh* for `staleTime` (30s here). The next two calls find a fresh entry under the same key and return it **without touching the network**.
 
-The mental-model failure this corrects: thinking "I called the hook, so a request went out." You didn't request data — you *subscribed to a cache key*. React Query decides whether that needs a network trip. Misunderstanding this is how people end up adding manual caching on top of a cache, or expecting fresh data and getting a 30-second-old copy.
+The mental-model failure this corrects: thinking "I called the hook, so a request went out." You didn't request data: you *subscribed to a cache key*. React Query decides whether that needs a network trip. Misunderstanding this is how people end up adding manual caching on top of a cache, or expecting fresh data and getting a 30-second-old copy.
 
 </div>
 </details>
 
 ---
 
-## Question 3 — One splice point for failure
+## Question 3: One splice point for failure
 
 <span class="diff diff--staff">Staff</span>
 
@@ -59,7 +59,7 @@ The mental-model failure this corrects: thinking "I called the hook, so a reques
 
 <div class="interview-a">
 
-**One splice point:** putting the same guard at the top of every resolver makes *every* endpoint failure-injectable with no per-endpoint code. The handler either dies early (chaos returns a Response) or proceeds to real data (chaos returns `null`). Uniformity is the win — you can't forget to make one endpoint testable, because the pattern is mechanical.
+**One splice point:** putting the same guard at the top of every resolver makes *every* endpoint failure-injectable with no per-endpoint code. The handler either dies early (chaos returns a Response) or proceeds to real data (chaos returns `null`). Uniformity is the win: you can't forget to make one endpoint testable, because the pattern is mechanical.
 
 **Realistic shapes:** the point of chaos isn't to simulate "an error," it's to simulate the *shapes your error handling must survive*. A 500 carrying `{ errors: [...] }` exercises the fetcher's `json.errors` throw; a 503 with no body makes `res.json()` itself throw; a 206 partial tests the half-success path. If chaos returned a single generic error, you'd only ever test one branch of your error handling and the others would rot untested until production found them.
 
@@ -68,7 +68,7 @@ The mental-model failure this corrects: thinking "I called the hook, so a reques
 
 ---
 
-## Question 4 — Two copies of the chaos config
+## Question 4: Two copies of the chaos config
 
 <span class="diff diff--staff">Staff</span>
 
@@ -79,24 +79,24 @@ The mental-model failure this corrects: thinking "I called the hook, so a reques
 
 <div class="interview-a">
 
-The chaos config lives in **two worlds**. The UI's copy is React state in `ChaosContext`. But the HTTP handlers run inside the **Service Worker**, reading a *separate* module-level `config` in `mocks/chaos.ts` — a different JavaScript context that React state can't reach directly.
+The chaos config lives in **two worlds**. The UI's copy is React state in `ChaosContext`. But the HTTP handlers run inside the **Service Worker**, reading a *separate* module-level `config` in `mocks/chaos.ts`, a different JavaScript context that React state can't reach directly.
 
 - **The POST** is the bridge: it ships the React config across the boundary into the Service Worker's module so `applyChaos()` sees the new settings.
 - **`invalidateQueries()`** then forces every cached query to refetch, so you immediately *see* the new failure mode instead of waiting for staleness to expire.
-- **The WebSocket hook needs neither** because it lives in React-land and reads `useChaos()` (the context) directly — same world, no boundary to cross.
+- **The WebSocket hook needs neither** because it lives in React-land and reads `useChaos()` (the context) directly, same world, no boundary to cross.
 
-The deeper lesson: config that must be true in two execution contexts has to be *synchronised*, and you keep one side authoritative (the React UI) pushing to the other (the worker). It's the "two sources of truth" problem in miniature — solved by making one the source and explicitly propagating it.
+The deeper lesson: config that must be true in two execution contexts has to be *synchronised*, and you keep one side authoritative (the React UI) pushing to the other (the worker). It's the "two sources of truth" problem in miniature, solved by making one the source and explicitly propagating it.
 
 </div>
 </details>
 
 ---
 
-## Question 5 — The round trip, in order
+## Question 5: The round trip, in order
 
 <span class="diff diff--senior">Senior</span>
 
-<div class="interview-q">Walk through what happens, in order, from a component calling <code>useAccountsQuery</code> to data on screen — assuming the cache is empty.</div>
+<div class="interview-q">Walk through what happens, in order, from a component calling <code>useAccountsQuery</code> to data on screen, assuming the cache is empty.</div>
 
 <details>
 <summary>Show answer</summary>
@@ -106,7 +106,7 @@ The deeper lesson: config that must be true in two execution contexts has to be 
 1. Hook computes the cache key `['Accounts', { walletId }]`; cache miss → run the `queryFn`.
 2. The generated `fetcher` makes a real `POST /graphql`.
 3. MSW's Service Worker intercepts it and matches the `Accounts` handler.
-4. Handler runs `applyChaos()` first — may inject latency or short-circuit with an error Response.
+4. Handler runs `applyChaos()` first: may inject latency or short-circuit with an error Response.
 5. If chaos returns `null`, the handler reads the fake DB (`getWalletById`) and **derives** each balance with `computeBalance(accountId)` from the ledger.
 6. The JSON response travels back through MSW → the fetcher → `res.json()`; `json.errors` is checked, then `json.data` is returned.
 7. React Query stores the result under the key, marks it fresh for `staleTime`, and hands it to the component, which re-renders.
@@ -116,10 +116,33 @@ The two things to name without prompting: the cache check at step 1 (most calls 
 </div>
 </details>
 
+---
+
+## Question 6: The feed that lied
+
+<span class="diff diff--staff">Staff</span>
+
+<div class="interview-q">A WebSocket handler used to update a live transaction feed by calling <code>queryClient.setQueriesData(...)</code> directly on the transaction list's cache, never touching the ledger. What broke, and why is "also update the balance cache in the same handler" the wrong fix?</div>
+
+<details>
+<summary>Show answer</summary>
+
+<div class="interview-a">
+
+What broke: the transaction *looked* real in the feed but `computeBalance()` (which only scans the ledger) never saw it, so the balance never moved. Worse, the entry existed only in that one cache: the moment the transaction list was refetched, it read the real ledger (which never had the entry) and the "transaction" vanished.
+
+"Also patch the balance cache" is the wrong fix because it doesn't fix the actual defect: it just chases it. There will always be another projection of the ledger (spending-by-category, the 30-day trend, tomorrow's export feature) that this handler doesn't know to update. You'd be signing up to keep an ever-growing list of caches in sync by hand, forever, and missing one is silent: nothing errors, a number is just quietly wrong somewhere.
+
+The real fix is structural: create one function that's the only way to add a ledger entry (`addLedgerEntry`), make the WS handler call it instead of touching any cache directly, then invalidate the same named set of query keys a transfer already invalidates. The handler no longer needs to know what balance, spending, or history *look like*: it just needs to know they all derive from the ledger, and the ledger just changed. One write, one blast radius, and every current and future projection is automatically correct.
+
+</div>
+</details>
+
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/the-chaos-that-wouldnt-happen">The Chaos That Wouldn't Happen — config across a boundary</a></li>
+<li><a href="../stories/the-chaos-that-wouldnt-happen">The Chaos That Wouldn't Happen: config across a boundary</a></li>
+<li><a href="../stories/the-feed-that-lied">The Feed That Lied: the phantom transaction bug</a></li>
 </ul>
 </div>
 
@@ -127,6 +150,7 @@ The two things to name without prompting: the cache check at step 1 (most calls 
 <h4>Interview Prep</h4>
 <ul>
 <li><a href="../interview/system-design">System Design Questions</a></li>
+<li><a href="../interview/data-and-state">Data & State Questions</a></li>
 </ul>
 </div>
 
@@ -135,5 +159,6 @@ The two things to name without prompting: the cache check at step 1 (most calls 
 <ul>
 <li><a href="../adrs/failure-simulation">Failure Simulation & Resilience System</a></li>
 <li><a href="../adrs/api-technology">API Technology Choice</a></li>
+<li><a href="../adrs/single-ledger-write-path">Single Ledger Write Path</a></li>
 </ul>
 </div>

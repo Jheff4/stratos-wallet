@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { formatCurrency } from '@shared/utils/formatters';
 
 // -------------------------------------------------------
-// Toast store — self-contained, no prop drilling needed
+// Toast store: self-contained, no prop drilling needed
 // -------------------------------------------------------
 export interface ToastMessage {
   id: string;
@@ -29,7 +29,7 @@ export const useToastStore = create<ToastState>((set) => ({
   remove: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));
 
-// Convenience helper — call anywhere, no hook needed
+// Convenience helper: call anywhere, no hook needed
 export function toast(t: Omit<ToastMessage, 'id'>) {
   useToastStore.getState().add(t);
 }
@@ -50,7 +50,7 @@ export function toastTransaction(tx: {
 }
 
 // -------------------------------------------------------
-// ToastContainer — mount once in App.tsx
+// ToastContainer: mount once in App.tsx
 // -------------------------------------------------------
 const variantStyles: Record<ToastMessage['variant'], { border: string; icon: string }> = {
   success: { border: 'var(--color-success)', icon: '✓' },

@@ -2,6 +2,7 @@ import { useWalletsQuery, useCreateWalletMutation } from '@graphql/generated';
 import { queryClient } from '../../queryClient';
 import { useState } from 'react';
 import ErrorCard from '@shared/components/ErrorCard';
+import DemoBadge from '@shared/components/DemoBadge';
 
 export default function WalletsPage() {
   const { data, isLoading, error } = useWalletsQuery();
@@ -30,6 +31,10 @@ export default function WalletsPage() {
       <div className="page-header">
         <h1 className="page-title">Wallets</h1>
         <p className="page-subtitle">Manage your wallets and linked accounts</p>
+        <DemoBadge concepts={[
+          { label: 'Contract-first GraphQL', path: '/adrs/api-technology' },
+          { label: 'Targeted cache invalidation', path: '/adrs/state-management' },
+        ]} />
       </div>
 
       <div className="page-body flex-col gap-6">

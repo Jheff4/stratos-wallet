@@ -2,6 +2,7 @@ import { useAccountsQuery } from '@graphql/generated';
 import { usePrefetchTransactions } from '@shared/hooks/usePrefetchTransactions';
 import { formatCurrency } from '@shared/utils/formatters';
 import ErrorCard from '@shared/components/ErrorCard';
+import DemoBadge from '@shared/components/DemoBadge';
 import { Link } from 'react-router-dom';
 
 function AccountSkeleton() {
@@ -86,6 +87,10 @@ export default function AccountListPage() {
       <div className="page-header">
         <h1 className="page-title">Accounts</h1>
         <p className="page-subtitle">All accounts linked to your wallet</p>
+        <DemoBadge concepts={[
+          { label: 'Balances are derived, never stored', path: '/adrs/ledger-first-data-model' },
+          { label: "O(n) reads & snapshots",             path: '/stories/sams-invisible-bug' },
+        ]} />
       </div>
 
       <div className="page-body flex-col gap-6">

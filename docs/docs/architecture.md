@@ -4,9 +4,9 @@
 
 Stratos Wallet is organised around three principles:
 
-1. **Vertical slices** — code is grouped by business domain, not by file type.
-2. **Contract-first development** — the GraphQL schema is the authoritative interface; components are derived from it, not the other way around.
-3. **Ledger as source of truth** — no financial value is stored. Every balance, chart, and metric is computed from an append-only ledger of entries.
+1. **Vertical slices**: code is grouped by business domain, not by file type.
+2. **Contract-first development**: the GraphQL schema is the authoritative interface; components are derived from it, not the other way around.
+3. **Ledger as source of truth**: no financial value is stored. Every balance, chart, and metric is computed from an append-only ledger of entries.
 
 These are not stylistic preferences. Each one solves a specific class of problem that grows more expensive as an application scales.
 
@@ -35,7 +35,7 @@ src/
     transaction.ts
 ```
 
-This works at small scale. At medium scale, a change to the transfer feature requires touching `components/`, `hooks/`, and `types/` — three separate trees. At large scale, a senior engineer cannot look at `components/` and understand what business domain any component serves.
+This works at small scale. At medium scale, a change to the transfer feature requires touching `components/`, `hooks/`, and `types/`: three separate trees. At large scale, a senior engineer cannot look at `components/` and understand what business domain any component serves.
 
 Vertical slices solve this by making the business domain the top-level organising principle:
 
@@ -68,7 +68,7 @@ Cross-cutting concerns that no single feature owns belong in `src/shared/`:
 ```
 src/shared/
   hooks/         useWebSocket, useTransactionSubscription
-  logger.ts      createLogger() — structured logging with trace IDs
+  logger.ts      createLogger() for structured logging with trace IDs
   api/           GraphQL fetcher, query client
   components/    Error boundaries, skeleton loaders
   utils/         Formatters, validators
@@ -86,7 +86,7 @@ Feature-to-feature imports create implicit coupling. When you change the transfe
 
 ### The problem it solves
 
-When the UI is built first and the API is added later, the API ends up shaped by what the UI happened to need — not by what the domain actually looks like. This produces APIs that are hard to reuse, hard to version, and impossible to document without reading the source code.
+When the UI is built first and the API is added later, the API ends up shaped by what the UI happened to need, not by what the domain actually looks like. This produces APIs that are hard to reuse, hard to version, and impossible to document without reading the source code.
 
 Contract-first reverses the order:
 
@@ -121,7 +121,7 @@ type Account {
 }
 ```
 
-`Account.balance` looks like a stored field. It is not. The GraphQL resolver calls `computeBalance(accountId)`, which scans the ledger and returns the derived total. The schema exposes the *result* of that computation as a scalar — the client does not need to know how it was computed.
+`Account.balance` looks like a stored field. It is not. The GraphQL resolver calls `computeBalance(accountId)`, which scans the ledger and returns the derived total. The schema exposes the *result* of that computation as a scalar; the client does not need to know how it was computed.
 
 ---
 
@@ -129,15 +129,15 @@ type Account {
 
 ### Strict mode is the floor, not a nice-to-have
 
-The project compiles under `"strict": true`. That umbrella flag turns on `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, `useUnknownInCatchVariables`, and more. For a money app the headline one is `strictNullChecks`: without it, `null` and `undefined` are silent members of every type, so `account.balance.toFixed(2)` compiles even when the account hasn't loaded — then throws `Cannot read properties of undefined` at runtime, on a balance view, in front of a user. Strict mode turns that class of bug into a compile error you must handle.
+The project compiles under `"strict": true`. That umbrella flag turns on `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, `useUnknownInCatchVariables`, and more. For a money app the headline one is `strictNullChecks`: without it, `null` and `undefined` are silent members of every type, so `account.balance.toFixed(2)` compiles even when the account hasn't loaded, then throws `Cannot read properties of undefined` at runtime, on a balance view, in front of a user. Strict mode turns that class of bug into a compile error you must handle.
 
 ### Errors are `unknown` until proven otherwise
 
 Two related decisions enforce honest error handling:
 
-1. **Error boundaries receive `unknown`, not `Error`.** In JavaScript you can `throw` anything — a string, an object, `undefined`. The `ErrorFallback` component types its `error` prop as `unknown` and narrows it through a single `toMessage()` choke point (`error instanceof Error ? error.message : String(error)`). The UI never assumes a shape it cannot prove.
+1. **Error boundaries receive `unknown`, not `Error`.** In JavaScript you can `throw` anything: a string, an object, `undefined`. The `ErrorFallback` component types its `error` prop as `unknown` and narrows it through a single `toMessage()` choke point (`error instanceof Error ? error.message : String(error)`). The UI never assumes a shape it cannot prove.
 
-2. **GraphQL hook errors are typed at the codegen layer.** By default `typescript-react-query` types `useXQuery().error` as `unknown`. That doesn't just force an `as Error` cast at every call site — it silently poisons JSX, because `unknown && <div/>` evaluates to `unknown`, which is not a valid `ReactNode`. Setting `errorType: 'Error'` in `codegen.ts` fixes error typing across *every* generated hook from one config line:
+2. **GraphQL hook errors are typed at the codegen layer.** By default `typescript-react-query` types `useXQuery().error` as `unknown`. That doesn't just force an `as Error` cast at every call site, it silently poisons JSX, because `unknown && <div/>` evaluates to `unknown`, which is not a valid `ReactNode`. Setting `errorType: 'Error'` in `codegen.ts` fixes error typing across *every* generated hook from one config line:
 
 ```ts
 // codegen.ts
@@ -159,7 +159,7 @@ Most demo applications store a `balance` field. Stripe, Coinbase, and every real
 
 **Why?**
 
-Because a balance is a *claim about history*. If your ledger says you received ₦50,000 and spent ₦20,000, your balance is ₦30,000 — and that is provable. If you store the balance as a separate number and it shows ₦31,000, you have a consistency bug that requires an audit to detect. Financial institutions are legally required to be able to reconstruct any historical balance, which is only possible if the full history is preserved.
+Because a balance is a *claim about history*. If your ledger says you received ₦50,000 and spent ₦20,000, your balance is ₦30,000, and that is provable. If you store the balance as a separate number and it shows ₦31,000, you have a consistency bug that requires an audit to detect. Financial institutions are legally required to be able to reconstruct any historical balance, which is only possible if the full history is preserved.
 
 ### How it works in this project
 
@@ -171,7 +171,7 @@ LedgerEntry[]            ← the single source of truth
   └── computeSpendingByCategory(walletId) → chart data
 ```
 
-The ledger is an in-memory array in `src/mocks/data.ts`. Every financial operation (deposit, withdrawal, transfer) appends a new `LedgerEntry`. No value is ever mutated — only new entries are added.
+The ledger is an in-memory array in `src/mocks/data.ts`. Every financial operation (deposit, withdrawal, transfer) appends a new `LedgerEntry`. No value is ever mutated; only new entries are added.
 
 Balance history, spending charts, and all analytics are projections: functions that scan the ledger and return a computed view.
 
@@ -207,14 +207,14 @@ Every event the server emits carries a unique `eventId` (UUID). The client maint
 - If yes: the event is silently discarded. Log entry written.
 - If no: the `eventId` is added to the seen set; the event is processed.
 
-This handles at-least-once delivery — a guarantee many real-time systems make: "we will deliver your message, but possibly more than once."
+This handles at-least-once delivery, a guarantee many real-time systems make: "we will deliver your message, but possibly more than once."
 
 **2. Sequence gap detection**
 
 Every event carries a monotonically increasing `seq` integer. The client tracks `lastSeq`. When an event arrives with `seq > lastSeq + 1`, a gap is detected and logged:
 
 ```
-[WARN] Sequence gap detected — missed events: { expected: 43, received: 47, missed: 4 }
+[WARN] Sequence gap detected: { expected: 43, received: 47, missed: 4 }
 ```
 
 On reconnect, the client sends `{ type: 'subscribe', lastSeq: N }`. The server replays any buffered events with `seq > N`.
@@ -300,7 +300,7 @@ The application includes a development-only chaos system that simulates realisti
 | `productionChaos` | All of the above, combined at lower rates |
 | `catastrophicFailure` | 80% errors, 50% message drops, forced disconnects |
 
-Every component in the system — GraphQL handlers, WebSocket messages, mutation responses — is routed through `applyChaos()` before being delivered to the UI.
+Every component in the system (GraphQL handlers, WebSocket messages, mutation responses) is routed through `applyChaos()` before being delivered to the UI.
 
 The purpose: build and test every feature under degraded conditions from the start, not after a production incident teaches you about the failure mode.
 
@@ -322,4 +322,4 @@ In production, these structured entries would ship to a log aggregation platform
 
 ### Failure observability
 
-Every silent handling decision — duplicate dropped, gap detected, chaos message skipped — writes a log entry. This is what distinguishes a production system from a demo: invisible failures should not stay invisible. They should leave a trace.
+Every silent handling decision (duplicate dropped, gap detected, chaos message skipped) writes a log entry. This is what distinguishes a production system from a demo: invisible failures should not stay invisible. They should leave a trace.

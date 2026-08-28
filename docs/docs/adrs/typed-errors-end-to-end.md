@@ -2,11 +2,11 @@
 
 ## Context
 
-Data-fetching errors enter the app from many places — GraphQL responses, network failures, third-party SDKs (Paystack, Mono, Dojah). The `typescript-react-query` codegen plugin types `useXQuery().error` as `unknown` by default, because it cannot know what a given endpoint throws.
+Data-fetching errors enter the app from many places: GraphQL responses, network failures, third-party SDKs (Paystack, Mono, Dojah). The `typescript-react-query` codegen plugin types `useXQuery().error` as `unknown` by default, because it cannot know what a given endpoint throws.
 
 `unknown` is correct but unergonomic, and in this codebase it caused a concrete defect: in a JSX truthiness expression, `unknown && <Component/>` evaluates to `unknown`, which is not a valid `ReactNode`. A single loosely-typed error field produced a compile error that TypeScript reported at the *wrong line* (the first child of the enclosing fragment), and which a developer could only "fix" with an unsafe `as Error` cast at every call site.
 
-We also compile under `"strict": true`, whose `useUnknownInCatchVariables` makes `catch` bindings `unknown` — reinforcing that error shape must be *proven*, not assumed.
+We also compile under `"strict": true`, whose `useUnknownInCatchVariables` makes `catch` bindings `unknown`, reinforcing that error shape must be *proven*, not assumed.
 
 ## Decision
 
@@ -32,21 +32,21 @@ function toMessage(error: unknown): string {
 ## Consequences
 
 - Error handling is type-safe across every feature with zero per-call ceremony; new integrations inherit it.
-- The type is backed by runtime reality because the fetcher normalizes throws — the declaration isn't a lie.
+- The type is backed by runtime reality because the fetcher normalizes throws: the declaration isn't a lie.
 - Error boundaries still receive `unknown` and narrow explicitly, which is correct: a render error can be anything.
 - If a future integration throws richer error objects, upgrading `errorType` to a custom class is again a one-line, one-place change.
 
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/the-error-at-the-wrong-line">The Error at the Wrong Line — debugging the unknown poison</a></li>
+<li><a href="../stories/the-error-at-the-wrong-line">The Error at the Wrong Line: debugging the unknown poison</a></li>
 </ul>
 </div>
 
 <div class="stratos-related">
 <h4>Interview Prep</h4>
 <ul>
-<li><a href="../interview/react-architecture">React Architecture Questions — typing errors from hooks</a></li>
+<li><a href="../interview/react-architecture">React Architecture Questions: typing errors from hooks</a></li>
 </ul>
 </div>
 

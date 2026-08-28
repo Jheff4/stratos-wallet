@@ -1,5 +1,6 @@
 import { useAppStore, type LiveEvent } from '../../store';
 import { formatCurrency } from '@shared/utils/formatters';
+import DemoBadge from '@shared/components/DemoBadge';
 
 function eventLabel(type: string) {
   switch (type) {
@@ -35,7 +36,7 @@ function EventRow({ event }: { event: LiveEvent }) {
             <div className="text-sm text-muted">{tx.sourceAccountId} → {tx.destinationAccountId}</div>
           </div>
         ) : (
-          <span className="text-muted text-sm">—</span>
+          <span className="text-muted text-sm">-</span>
         )}
       </td>
       <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -75,6 +76,11 @@ export default function ActivityPage() {
             <p className="page-subtitle">
               Real-time WebSocket event stream · {events.length} events this session
             </p>
+            <DemoBadge concepts={[
+              { label: 'Sequence numbers & gap detection', path: '/stories/azeez-in-the-tunnel' },
+              { label: 'Deduplication by eventId',         path: '/stories/jons-duplicate-feed' },
+              { label: 'Backoff & reconnect',              path: '/stories/the-reconnect-storm' },
+            ]} />
           </div>
           <div className="flex items-center gap-4">
             {/* WS status pill */}
@@ -128,7 +134,7 @@ export default function ActivityPage() {
                 padding: '4px 10px',
                 borderRadius: 4,
               }}>
-                cd server && npx ts-node src/index.ts
+                cd server && pnpm dev
               </code>
             </div>
           ) : (

@@ -2,13 +2,13 @@
 sidebar_label: "State Management"
 ---
 
-# Quiz — State Management
+# Quiz: State Management
 
 Covers the three categories of state, React Query cache design, targeted invalidation, and optimistic updates. Reference: [ADR: State Management](../adrs/state-management) · [ADR: Idempotency & Optimistic Updates](../adrs/idempotency-and-optimistic-updates).
 
 ---
 
-## Question 1 — Three categories of state
+## Question 1: Three categories of state
 
 <span class="diff diff--senior">Senior</span>
 
@@ -19,7 +19,7 @@ Covers the three categories of state, React Query cache design, targeted invalid
 
 <div class="interview-a">
 
-- **Server state** → React Query cache (wallet data, balances, transactions). It's a cache of someone else's data, so it needs staleness, refetching, and invalidation — exactly what React Query provides.
+- **Server state** → React Query cache (wallet data, balances, transactions). It's a cache of someone else's data, so it needs staleness, refetching, and invalidation: exactly what React Query provides.
 - **Global client state** → Zustand (session, theme). Cross-cutting, but owned by the client.
 - **Local UI state** → `useState` (form inputs, modal open/close). Belongs to one component.
 
@@ -30,7 +30,7 @@ The rule: **use the most local storage that works.** Form state never goes in Zu
 
 ---
 
-## Question 2 — Targeted invalidation
+## Question 2: Targeted invalidation
 
 <span class="diff diff--senior">Senior</span>
 
@@ -41,7 +41,7 @@ The rule: **use the most local storage that works.** Form state never goes in Zu
 
 <div class="interview-a">
 
-Structured keys let you invalidate **precisely**. A transfer can invalidate `['accounts', fromId]` and `['accounts', toId]` and leave the transaction feed, balance history, and unrelated wallets alone — only the data that actually changed is refetched.
+Structured keys let you invalidate **precisely**. A transfer can invalidate `['accounts', fromId]` and `['accounts', toId]` and leave the transaction feed, balance history, and unrelated wallets alone: only the data that actually changed is refetched.
 
 A flat or coarse cache forces a choice between two bad options: invalidate everything (a thundering refetch and UI flicker on every mutation) or invalidate nothing (stale balances). Parameterised keys give you a scalpel instead of a sledgehammer.
 
@@ -50,7 +50,7 @@ A flat or coarse cache forces a choice between two bad options: invalidate every
 
 ---
 
-## Question 3 — Optimistic updates: the three callbacks
+## Question 3: Optimistic updates: the three callbacks
 
 <span class="diff diff--senior">Senior</span>
 
@@ -62,28 +62,28 @@ A flat or coarse cache forces a choice between two bad options: invalidate every
 <div class="interview-a">
 
 - **`onMutate`**: `cancelQueries` first (so an in-flight refetch can't land *after* your optimistic write and clobber it), snapshot the current cache, then apply the expected result so the UI updates instantly.
-- **`onError`**: restore the snapshot — roll back so the UI never shows a permanently wrong state.
+- **`onError`**: restore the snapshot, roll back so the UI never shows a permanently wrong state.
 - **`onSettled`**: invalidate the affected keys regardless of success or failure.
 
-Why invalidate even on success: the optimistic value is a *guess*. The server may have applied a fee, rounded, or reordered. You don't trust your guess *or* your rollback — on settle you ask the server for the truth. Instant feedback (optimism) plus eventual consistency (invalidate) is the whole pattern.
+Why invalidate even on success: the optimistic value is a *guess*. The server may have applied a fee, rounded, or reordered. You don't trust your guess *or* your rollback: on settle you ask the server for the truth. Instant feedback (optimism) plus eventual consistency (invalidate) is the whole pattern.
 
 </div>
 </details>
 
 ---
 
-## Question 4 — Optimistic state surviving unmount
+## Question 4: Optimistic state surviving unmount
 
 <span class="diff diff--staff">Staff</span>
 
-<div class="interview-q">A user starts a transfer, navigates away before it resolves, then returns. Why doesn't the rollback break — and what would break it?</div>
+<div class="interview-q">A user starts a transfer, navigates away before it resolves, then returns. Why doesn't the rollback break, and what would break it?</div>
 
 <details>
 <summary>Show answer</summary>
 
 <div class="interview-a">
 
-The snapshot lives in the **React Query cache**, not in component state. So when the component unmounts on navigation, the snapshot and the in-flight mutation survive — the rollback (or invalidation) still has something to act on when the request settles.
+The snapshot lives in the **React Query cache**, not in component state. So when the component unmounts on navigation, the snapshot and the in-flight mutation survive: the rollback (or invalidation) still has something to act on when the request settles.
 
 What would break it: holding the snapshot in `useState` inside the page component. On unmount that state is gone, so an error after navigation has nothing to roll back to, and the cache is left in the optimistic (possibly wrong) state. Stable cache keys + cache-held snapshots are what make it survive.
 
@@ -93,8 +93,8 @@ What would break it: holding the snapshot in `useState` inside the page componen
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/the-optimistic-chef">The Optimistic Chef — optimistic UI done right</a></li>
-<li><a href="../stories/sams-double-transfer">Sam's Double Transfer — idempotency</a></li>
+<li><a href="../stories/the-optimistic-chef">The Optimistic Chef: optimistic UI done right</a></li>
+<li><a href="../stories/sams-double-transfer">Sam's Double Transfer: idempotency</a></li>
 </ul>
 </div>
 

@@ -7,7 +7,7 @@ sidebar_label: "About this section"
 
 The specs explain what we built and why. The ADRs document the decisions and tradeoffs. This section does something different.
 
-Every concept in Stratos Wallet has a story behind it — a real-world scenario where someone got hurt because the engineering was wrong, or where the right design saved everything. These are the scenarios experienced engineers keep in their heads as intuition pumps. They're how the abstract pattern becomes something you actually remember when you're under pressure in an interview or at 2am debugging production.
+Every concept in Stratos Wallet has a story behind it: a real-world scenario where someone got hurt because the engineering was wrong, or where the right design saved everything. These are the scenarios experienced engineers keep in their heads as intuition pumps. They're how the abstract pattern becomes something you actually remember when you're under pressure in an interview or at 2am debugging production.
 
 The characters here are fictional. The failure modes are not.
 
@@ -22,6 +22,7 @@ The characters here are fictional. The failure modes are not.
 | [Nate's Missing Thousands](./nates-missing-thousands) | A fee calculation bug. With stored balances, the correct numbers are gone forever. With a ledger, fix the function and recompute. |
 | [The Two Filing Cabinets](./two-filing-cabinets) | Two wallet stores drift apart. New users get empty balance history. One store fixes it permanently. |
 | [Sam's Invisible Bug](./sams-invisible-bug) | O(n) balance reads. Fine at 20 entries per account, 4-second latency at 5,000. Snapshots are the answer. |
+| [The Feed That Lied](./the-feed-that-lied) | A live transaction feed that never touched the ledger: balances stayed frozen while "transactions" scrolled past. One write path fixes it. |
 
 ---
 
@@ -65,7 +66,7 @@ The characters here are fictional. The failure modes are not.
 
 | Story | What breaks without it |
 |---|---|
-| [The Chaos That Wouldn't Happen](./the-chaos-that-wouldnt-happen) | A chaos toggle that changes nothing — config lives in two execution contexts and silently drifts. One source of truth, pushed across the boundary. |
+| [The Chaos That Wouldn't Happen](./the-chaos-that-wouldnt-happen) | A chaos toggle that changes nothing: config lives in two execution contexts and silently drifts. One source of truth, pushed across the boundary. |
 
 ---
 

@@ -6,7 +6,7 @@
 
 The transaction feed and account balances need live updates. A user viewing the dashboard should see a new deposit without refreshing. A user initiating a transfer should see the updated balance reflected immediately after confirmation.
 
-Future features — trade execution, price feeds — require bidirectional communication.
+Future features (trade execution, price feeds) require bidirectional communication.
 
 We need to decide:
 - What transport to use for real-time events
@@ -21,11 +21,11 @@ Use **WebSocket** as the primary real-time channel, managed by a custom `useWebS
 
 The hook provides:
 
-1. **Exponential backoff reconnection** — Prevents reconnect storms after outages.
-2. **Event deduplication by `eventId`** — Handles at-least-once delivery from the server.
-3. **Sequence number tracking** — Detects gaps in the event stream.
-4. **Missed-event replay** — On reconnect, sends `lastSeq` so the server can replay missed events.
-5. **Connection status** — Exposes `connecting | connected | reconnecting | disconnected` to the UI.
+1. **Exponential backoff reconnection**: prevents reconnect storms after outages.
+2. **Event deduplication by `eventId`**: handles at-least-once delivery from the server.
+3. **Sequence number tracking**: detects gaps in the event stream.
+4. **Missed-event replay**: on reconnect, sends `lastSeq` so the server can replay missed events.
+5. **Connection status**: exposes `connecting | connected | reconnecting | disconnected` to the UI.
 
 The server assigns every emitted event a monotonically increasing `seq` integer and a unique `eventId` UUID before delivery.
 
@@ -43,7 +43,7 @@ A user opens the app on a train. They go through a tunnel. The WebSocket drops. 
 
 ### Scenario: duplicate delivery
 
-The network drops immediately after the server sends event #1422. The server doesn't know the delivery succeeded. When the client reconnects with `lastSeq: 1421`, the server replays #1422 — which the client already processed before the drop.
+The network drops immediately after the server sends event #1422. The server doesn't know the delivery succeeded. When the client reconnects with `lastSeq: 1421`, the server replays #1422, which the client already processed before the drop.
 
 **Without deduplication:** The transaction appears twice in the feed. The balance is wrong.
 
@@ -105,7 +105,7 @@ A simpler HTTP-based unidirectional stream. The browser natively handles reconne
 
 Runs WebSocket events through the GraphQL schema. Subscriptions are type-safe and co-located with queries and mutations.
 
-**Advantages:** Consistent API surface — everything is GraphQL. Type-safe subscription events via codegen.
+**Advantages:** Consistent API surface: everything is GraphQL. Type-safe subscription events via codegen.
 
 **Why not chosen:** Requires a stateful GraphQL server that supports `graphql-ws`. Our mock layer (MSW) handles GraphQL over HTTP but does not implement the `graphql-ws` subprotocol. Implementing this for a mock environment adds complexity without proportional benefit.
 
@@ -122,7 +122,7 @@ Repeated HTTP requests at an interval, simulating real-time updates.
 ## Consequences
 
 **Positive:**
-- True push delivery — no polling overhead.
+- True push delivery: no polling overhead.
 - Replay protocol handles disconnects gracefully.
 - Deduplication makes the system safe for at-least-once delivery.
 - Connection status is exposed for UI-level feedback.
@@ -131,7 +131,7 @@ Repeated HTTP requests at an interval, simulating real-time updates.
 - WebSocket connections require persistent server resources per client.
 - The custom reconnection and replay logic adds client-side complexity.
 - The replay buffer (200 events) means very long disconnections (>200 events) require a full refetch fallback.
-- WebSocket does not work in environments where HTTP proxies strip upgrade headers — requires fallback handling in those cases.
+- WebSocket does not work in environments where HTTP proxies strip upgrade headers, which requires fallback handling in those cases.
 
 ---
 
@@ -167,14 +167,14 @@ stateDiagram-v2
 
 > "How would you design a real-time balance update system?"
 
-The answer that distinguishes staff-level thinking: "I'd use WebSocket for delivery with at-least-once guarantees, sequence numbers for gap detection, deduplication by event ID for replay safety, and a bounded replay buffer on the server. On reconnect, the client sends its last known sequence and the server replays anything it missed. If the gap exceeds the buffer, the client falls back to a full REST refetch. The UI exposes connection status so the user can see when they're reconnecting — you never silently show potentially stale data without an indicator."
+The answer that distinguishes staff-level thinking: "I'd use WebSocket for delivery with at-least-once guarantees, sequence numbers for gap detection, deduplication by event ID for replay safety, and a bounded replay buffer on the server. On reconnect, the client sends its last known sequence and the server replays anything it missed. If the gap exceeds the buffer, the client falls back to a full REST refetch. The UI exposes connection status so the user can see when they're reconnecting: you never silently show potentially stale data without an indicator."
 
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/azeez-in-the-tunnel">Azeez in the Tunnel — sequence numbers & replay</a></li>
-<li><a href="../stories/jons-duplicate-feed">Jon's Duplicate Feed — deduplication</a></li>
-<li><a href="../stories/the-reconnect-storm">The Reconnect Storm — exponential backoff</a></li>
+<li><a href="../stories/azeez-in-the-tunnel">Azeez in the Tunnel: sequence numbers & replay</a></li>
+<li><a href="../stories/jons-duplicate-feed">Jon's Duplicate Feed: deduplication</a></li>
+<li><a href="../stories/the-reconnect-storm">The Reconnect Storm: exponential backoff</a></li>
 </ul>
 </div>
 

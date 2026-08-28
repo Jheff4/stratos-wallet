@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { WSConnectionStatus } from '@shared/hooks/useWebSocket';
 
 // -------------------------------------------------------
-// Live event — a WS message that arrived in this session
+// Live event: a WS message that arrived in this session
 // -------------------------------------------------------
 export interface LiveEvent {
   id: string;          // eventId from server
@@ -17,7 +17,7 @@ export interface LiveEvent {
 // App-wide Zustand store
 // -------------------------------------------------------
 interface AppState {
-  // Auth (stub — wire up when login is built out)
+  // Auth (stub, wire up when login is built out)
   isAuthenticated: boolean;
 
   // Real-time WS status

@@ -1,25 +1,25 @@
 import { WebSocketServer, WebSocket } from 'ws';
 
 // ============================================================
-// Stratos Wallet — WebSocket Event Server
+// Stratos Wallet: WebSocket Event Server
 // ============================================================
 //
 // PROTOCOL DESIGN
 //
 // Every event the server emits carries two reliability fields:
 //
-//   seq     — a monotonically increasing integer, global across
+//   seq     : a monotonically increasing integer, global across
 //             all clients. Never resets while the server is running.
 //             Purpose: lets clients detect gaps (missed events).
 //
-//   eventId — a UUID that is unique per event emission.
+//   eventId : a UUID that is unique per event emission.
 //             Purpose: lets clients deduplicate events that arrive
 //             more than once due to network retransmission or
 //             chaos simulation.
 //
 // WHY BOTH?
 //   seq alone cannot deduplicate: the same seq is never reused, so
-//   a duplicate delivery of event #42 arrives as seq=42 twice —
+//   a duplicate delivery of event #42 arrives as seq=42 twice,
 //   but the client cannot distinguish "I got 42 twice" from "I got
 //   42 once." EventId solves this: it is unique per emission, so
 //   seeing the same eventId twice means "drop it."
@@ -60,7 +60,7 @@ console.log(`[WS Server] Running on ws://localhost:${PORT}`);
 // --------------------------------------------------------
 // Global sequence counter.
 // Increments with every event emitted to any client.
-// Never resets — monotonic for the server lifetime.
+// Never resets: monotonic for the server lifetime.
 // --------------------------------------------------------
 let globalSeq = 0;
 
@@ -118,7 +118,7 @@ function broadcast(type: string, payload: Record<string, unknown>): void {
 void broadcast; // exported for future use
 
 // --------------------------------------------------------
-// Transaction generator — simulates a live transaction feed.
+// Transaction generator: simulates a live transaction feed.
 // In production this would be driven by actual ledger writes.
 // --------------------------------------------------------
 const TRANSACTION_TYPES  = ['DEPOSIT', 'WITHDRAWAL', 'TRANSFER'] as const;
@@ -177,7 +177,7 @@ wss.on('connection', (ws) => {
         const bufferStart = eventBuffer.length > 0 ? eventBuffer[0].seq : globalSeq;
 
         if (lastSeq < bufferStart - 1 && missed.length === 0 && globalSeq > lastSeq) {
-          // The gap is larger than the buffer — the client missed more
+          // The gap is larger than the buffer: the client missed more
           // events than we can replay. Tell it to do a full refetch.
           ws.send(JSON.stringify({
             type:        'replay_overflow',

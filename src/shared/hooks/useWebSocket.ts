@@ -3,36 +3,36 @@ import { useChaos } from '@chaos/ChaosContext';
 import { createLogger } from '@shared/logger';
 
 // ============================================================
-// useWebSocket — Reliable WebSocket Hook
+// useWebSocket: Reliable WebSocket Hook
 // ============================================================
 //
 // WHAT THIS HOOK PROVIDES ON TOP OF RAW WebSocket:
 //
 //   1. Exponential backoff reconnection
-//      — Prevents reconnect storms after an outage.
+//      Prevents reconnect storms after an outage.
 //        If 10,000 clients all reconnect at once, the server
 //        dies. Randomised backoff spreads the load.
 //
 //   2. Event deduplication (by eventId)
-//      — At-least-once delivery is a guarantee many systems
+//      At-least-once delivery is a guarantee many systems
 //        make. "We will deliver your message, possibly more
 //        than once." The receiver must be idempotent.
 //        We track the last DEDUP_WINDOW_SIZE eventIds and
 //        drop any we've already processed.
 //
 //   3. Sequence number tracking (seq)
-//      — Lets us detect gaps: if we receive seq=45 and our
+//      Lets us detect gaps: if we receive seq=45 and our
 //        lastSeq=42, we know we missed #43 and #44.
 //        On reconnect, we send { type: 'subscribe', lastSeq }
 //        so the server can replay what we missed.
 //
 //   4. Connection status
-//      — Exposes 'connected' | 'reconnecting' | 'disconnected'
+//      Exposes 'connected' | 'reconnecting' | 'disconnected'
 //        so UI can show appropriate feedback without digging
 //        into WebSocket internals.
 //
 //   5. Chaos simulation
-//      — Integrates with ChaosContext to simulate latency,
+//      Integrates with ChaosContext to simulate latency,
 //        message drops, duplicates, reordering, and forced
 //        disconnects. Every chaos path is logged so you can
 //        see exactly what the simulation is doing.
@@ -42,11 +42,11 @@ import { createLogger } from '@shared/logger';
 // DEDUPLICATION WINDOW SIZE
 //
 // We keep the last N eventIds in a Set. When an event arrives:
-//   — If its eventId is in the Set: drop it (duplicate).
-//   — If not: add it to the Set, process the event.
+//   If its eventId is in the Set: drop it (duplicate).
+//   If not: add it to the Set, process the event.
 //
 // When the Set exceeds DEDUP_WINDOW_SIZE, we remove the oldest
-// entry. This is a LRU-lite eviction — not perfect (we use a
+// entry. This is a LRU-lite eviction, not perfect (we use a
 // Set, not a proper LRU cache) but correct for our load.
 //
 // In production: use a proper LRU cache or a time-based TTL
@@ -100,15 +100,15 @@ export function useWebSocket(
   const pingIntervalRef       = useRef<ReturnType<typeof setInterval> | null>(null);
   const reconnectAttemptsRef  = useRef(0);
 
-  // Sequence tracking — persists across reconnects so we can
+  // Sequence tracking: persists across reconnects so we can
   // request replay of missed events on every reconnect.
   const lastSeqRef = useRef<number>(0);
 
-  // Deduplication window — bounded Set of recently seen eventIds.
+  // Deduplication window: bounded Set of recently seen eventIds.
   // Using a Set for O(1) lookups; eviction is manual.
   const seenEventIds = useRef<Set<string>>(new Set());
 
-  // Stable ref to the message handler — prevents reconnecting
+  // Stable ref to the message handler: prevents reconnecting
   // every time the parent component re-renders with a new inline
   // function reference.
   const onMessageRef = useRef<MessageHandler>(onMessage);
@@ -163,7 +163,7 @@ export function useWebSocket(
 
       // Subscribe and request replay of any events missed while
       // we were disconnected. lastSeq=0 on first connect means
-      // "I have nothing yet" — server sends replay_complete immediately.
+      // "I have nothing yet," server sends replay_complete immediately.
       ws.send(JSON.stringify({
         type:    'subscribe',
         lastSeq: lastSeqRef.current,
@@ -210,7 +210,7 @@ export function useWebSocket(
           const delay = 100 + Math.random() * 300;
           logger.warn('Chaos: scheduling duplicate event', { type: data.type, seq: data.seq, delayMs: delay });
           setTimeout(() => processMessage(data), delay);
-          // Fall through — also deliver the original immediately below.
+          // Fall through: also deliver the original immediately below.
         }
 
         processMessage(data);
@@ -270,7 +270,7 @@ export function useWebSocket(
   }, [url, config.messageDropRate, config.messageReorderRate, config.duplicateWsEvents, isDuplicate]);
 
   // --------------------------------------------------------
-  // processMessage — deduplication + sequence tracking
+  // processMessage: deduplication + sequence tracking
   // --------------------------------------------------------
   function processMessage(data: WSMessage): void {
     // Deduplication: if we've seen this eventId, drop it.
@@ -291,7 +291,7 @@ export function useWebSocket(
 
       if (data.seq > expectedSeq) {
         const missed = data.seq - expectedSeq;
-        logger.warn('Sequence gap detected — missed events', {
+        logger.warn('Sequence gap detected', {
           expected: expectedSeq,
           received: data.seq,
           missed,
@@ -346,7 +346,7 @@ export function useWebSocket(
   }, [config.forceDisconnect]);
 
   // --------------------------------------------------------
-  // send — safely sends a message when the socket is open.
+  // send: safely sends a message when the socket is open.
   // Callers do not need to check readyState themselves.
   // --------------------------------------------------------
   const send = useCallback((data: unknown) => {

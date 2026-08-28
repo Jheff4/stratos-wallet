@@ -4,14 +4,14 @@
 
 ## Context
 
-As Stratos Wallet grows across multiple business domains — authentication, wallet management, transfers, transaction history, notifications, admin — we need a code organisation strategy that:
+As Stratos Wallet grows across multiple business domains (authentication, wallet management, transfers, transaction history, notifications, admin), we need a code organisation strategy that:
 
 - Keeps related code close together rather than scattered across the project
 - Makes it clear who owns what, both for individual developers and for teams
 - Allows a feature to be understood, tested, or deleted without reading the whole codebase
 - Does not produce merge conflicts when two engineers work on separate features simultaneously
 
-The default alternative — organising by file type — puts all components together, all hooks together, and all types together. This is intuitive for small projects and increasingly painful for large ones.
+The default alternative (organising by file type) puts all components together, all hooks together, and all types together. This is intuitive for small projects and increasingly painful for large ones.
 
 ---
 
@@ -62,7 +62,7 @@ With vertical slices, engineer A touches `features/transfers/` and engineer B to
 
 ### The deletion problem
 
-Removing a feature from a file-type-organised project requires knowing which components, hooks, and types belong to that feature — information that is not encoded in the directory structure. With vertical slices, deleting a feature is deleting a folder.
+Removing a feature from a file-type-organised project requires knowing which components, hooks, and types belong to that feature, information that is not encoded in the directory structure. With vertical slices, deleting a feature is deleting a folder.
 
 ---
 
@@ -120,14 +120,14 @@ The follow-up that separates staff from senior: "The real challenge is what goes
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/nates-messy-flat">Nate's Messy Flat — vertical slices explained</a></li>
+<li><a href="../stories/nates-messy-flat">Nate's Messy Flat: vertical slices explained</a></li>
 </ul>
 </div>
 
 <div class="stratos-related">
 <h4>Interview Prep</h4>
 <ul>
-<li><a href="../interview/react-architecture">React Architecture — structuring a large codebase</a></li>
-<li><a href="../interview/behavioural">Behavioural — approaching an unfamiliar codebase</a></li>
+<li><a href="../interview/react-architecture">React Architecture: structuring a large codebase</a></li>
+<li><a href="../interview/behavioural">Behavioural: approaching an unfamiliar codebase</a></li>
 </ul>
 </div>

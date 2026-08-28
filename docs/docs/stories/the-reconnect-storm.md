@@ -16,7 +16,7 @@ The server goes down. Good.
 
 Then this happens.
 
-At 11:58:03pm — the exact second the server comes back online — 12,000 WebSocket clients reconnect simultaneously. Every client had been retrying every second. Every client was waiting for the server. The moment the server restarted, all 12,000 hit it at the same time.
+At 11:58:03pm (the exact second the server comes back online), 12,000 WebSocket clients reconnect simultaneously. Every client had been retrying every second. Every client was waiting for the server. The moment the server restarted, all 12,000 hit it at the same time.
 
 The server, having just restarted with minimal warm-up, receives 12,000 connection requests in one second. It runs out of connection pool capacity. It starts dropping connections. Clients that reconnected successfully are immediately disconnected again because the server can't handle the load. Those clients retry. The cycle repeats.
 
@@ -30,7 +30,7 @@ The root cause is simple: every client was retrying on the same cadence. When th
 
 The fix is two lines of code.
 
-After every disconnect, instead of retrying in exactly one second, the client waits for a delay that grows exponentially — and adds a random jitter.
+After every disconnect, instead of retrying in exactly one second, the client waits for a delay that grows exponentially, and adds a random jitter.
 
 ```ts
 const baseDelay  = 1000 * Math.pow(2, attempt);     // 1s, 2s, 4s, 8s, 16s...
@@ -53,13 +53,13 @@ The 12,000 reconnections that used to arrive at the same moment are now spread a
 
 Jitter alone solves the "all at once" problem but not the "retrying too frequently" problem.
 
-If 12,000 clients each retry every second with random jitter, you still get roughly 12,000 reconnection attempts every second, just spread across time within each second. That's still 720 per minute — a constant, heavy load on a recovering server.
+If 12,000 clients each retry every second with random jitter, you still get roughly 12,000 reconnection attempts every second, just spread across time within each second. That's still 720 per minute: a constant, heavy load on a recovering server.
 
 The exponential part means each failed attempt makes the client wait longer. After five failures, a client is waiting 32 seconds before the next attempt. After six, 64 seconds. This is the system's way of saying: "If you've been unable to connect multiple times in a row, back off and give the server room to recover."
 
 Combined, they do two things:
-1. **Jitter** spreads reconnections across time within each retry cycle — prevents simultaneous reconnect storms.
-2. **Exponential growth** increases the interval between retries over time — reduces load on a struggling server.
+1. **Jitter** spreads reconnections across time within each retry cycle: prevents simultaneous reconnect storms.
+2. **Exponential growth** increases the interval between retries over time: reduces load on a struggling server.
 
 ---
 
@@ -74,7 +74,7 @@ attempt 4: 16s  base + 0–1s jitter  → 16.0–17.0s
 attempt 5+: capped at 30s            → 30.0–31.0s
 ```
 
-No two clients that disconnected at the same time will retry at exactly the same time. And the gap between retries grows — so a recovering server gets progressively more breathing room.
+No two clients that disconnected at the same time will retry at exactly the same time. And the gap between retries grows, so a recovering server gets progressively more breathing room.
 
 ---
 
@@ -92,9 +92,9 @@ That's exponential backoff with jitter. The random spread is the jitter. The inc
 
 ## Why the cap at 30 seconds
 
-Without a cap, the wait time doubles forever. After 10 failed attempts, a client would wait 17 minutes. After 12, an hour. That's not useful — the user has left.
+Without a cap, the wait time doubles forever. After 10 failed attempts, a client would wait 17 minutes. After 12, an hour. That's not useful: the user has left.
 
-The cap says: "After enough failures, stabilise at 30 seconds. Keep trying, just not frantically." The client stays connected to the retry loop. When the server eventually recovers, the client reconnects within 30 seconds — without ever having given up entirely.
+The cap says: "After enough failures, stabilise at 30 seconds. Keep trying, just not frantically." The client stays connected to the retry loop. When the server eventually recovers, the client reconnects within 30 seconds, without ever having given up entirely.
 
 ---
 
@@ -117,7 +117,7 @@ Exponential backoff with jitter is the standard solution, used by every major cl
 <div class="stratos-related">
 <h4>Related Stories</h4>
 <ul>
-<li><a href="./azeez-in-the-tunnel">Azeez in the Tunnel — what happens after reconnect</a></li>
-<li><a href="./jons-duplicate-feed">Jon's Duplicate Feed — deduplication after reconnect</a></li>
+<li><a href="./azeez-in-the-tunnel">Azeez in the Tunnel: what happens after reconnect</a></li>
+<li><a href="./jons-duplicate-feed">Jon's Duplicate Feed: deduplication after reconnect</a></li>
 </ul>
 </div>

@@ -5,6 +5,7 @@ import {
   getWalletById,
   getAccountById,
   addWallet,
+  addLedgerEntry,
   computeBalance,
   computeBalanceHistory,
   computeSpendingByCategory,
@@ -231,7 +232,7 @@ export const handlers = [
       category:             'Transfer',
     };
 
-    ledger.unshift(newTransaction);
+    addLedgerEntry(newTransaction);
 
     const res = { success: true, transaction: newTransaction };
     idempotencyStore.set(idempotencyKey, res);

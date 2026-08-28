@@ -3,6 +3,7 @@ import { useAccountsQuery, useTransferFundsMutation, type AccountsQuery } from '
 import { queryClient } from '../../queryClient';
 import { formatCurrency } from '@shared/utils/formatters';
 import ErrorCard from '@shared/components/ErrorCard';
+import DemoBadge from '@shared/components/DemoBadge';
 
 // ---- Loading skeleton ----
 function TransferSkeleton() {
@@ -200,6 +201,10 @@ export default function TransferPage() {
       <div className="page-header">
         <h1 className="page-title">Transfer Funds</h1>
         <p className="page-subtitle">Move money between your accounts instantly</p>
+        <DemoBadge concepts={[
+          { label: 'Optimistic updates & rollback', path: '/adrs/idempotency-and-optimistic-updates' },
+          { label: 'Idempotency keys',               path: '/stories/sams-double-transfer' },
+        ]} />
       </div>
 
       <div className="page-body">
@@ -242,7 +247,7 @@ export default function TransferPage() {
                     <option value="">Select source account</option>
                     {accounts.map((a) => (
                       <option key={a.id} value={a.id} disabled={a.id === toAccountId}>
-                        {a.name} — {formatCurrency(a.balance, a.currency)}
+                        {a.name} · {formatCurrency(a.balance, a.currency)}
                       </option>
                     ))}
                   </select>
@@ -265,7 +270,7 @@ export default function TransferPage() {
                     <option value="">Select destination account</option>
                     {accounts.map((a) => (
                       <option key={a.id} value={a.id} disabled={a.id === fromAccountId}>
-                        {a.name} — {formatCurrency(a.balance, a.currency)}
+                        {a.name} · {formatCurrency(a.balance, a.currency)}
                       </option>
                     ))}
                   </select>

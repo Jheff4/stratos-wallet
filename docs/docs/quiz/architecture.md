@@ -2,13 +2,13 @@
 sidebar_label: "Architecture & Structure"
 ---
 
-# Quiz — Architecture & Structure
+# Quiz: Architecture & Structure
 
 Covers vertical slices, the shared kernel, and contract-first development. Reference: [Architecture](../architecture) · [ADR: Vertical Slice Architecture](../adrs/vertical-slice-architecture).
 
 ---
 
-## Question 1 — Why vertical slices
+## Question 1: Why vertical slices
 
 <span class="diff diff--senior">Senior</span>
 
@@ -19,16 +19,16 @@ Covers vertical slices, the shared kernel, and contract-first development. Refer
 
 <div class="interview-a">
 
-In file-type organisation, understanding or changing one feature means touching four separate trees — `components/`, `hooks/`, `types/`, `tests/`. Two engineers on unrelated features collide in the same folders and produce merge conflicts on files that have nothing to do with each other.
+In file-type organisation, understanding or changing one feature means touching four separate trees: `components/`, `hooks/`, `types/`, `tests/`. Two engineers on unrelated features collide in the same folders and produce merge conflicts on files that have nothing to do with each other.
 
-Vertical slices co-locate everything one feature owns. The blast radius of a change is one folder. You can read a feature top to bottom without jumping the tree, and you can delete a feature by deleting its directory. It optimises for the thing teams actually do — change one capability at a time — instead of for an alphabetised filing cabinet.
+Vertical slices co-locate everything one feature owns. The blast radius of a change is one folder. You can read a feature top to bottom without jumping the tree, and you can delete a feature by deleting its directory. It optimises for the thing teams actually do (change one capability at a time) instead of for an alphabetised filing cabinet.
 
 </div>
 </details>
 
 ---
 
-## Question 2 — The shared kernel rule
+## Question 2: The shared kernel rule
 
 <span class="diff diff--senior">Senior</span>
 
@@ -41,14 +41,14 @@ Vertical slices co-locate everything one feature owns. The blast radius of a cha
 
 Something belongs in `shared/` only if it's used by **three or more** slices, or it's a genuine system-wide concern (logging, the HTTP/GraphQL client, error boundaries, formatters). One feature needing a helper? That helper lives in that feature.
 
-The failure mode without the rule: `shared/` becomes a junk drawer. Everything drifts there "just in case," coupling unrelated features through a shared utilities blob — which is the file-type problem wearing a different hat.
+The failure mode without the rule: `shared/` becomes a junk drawer. Everything drifts there "just in case," coupling unrelated features through a shared utilities blob, which is the file-type problem wearing a different hat.
 
 </div>
 </details>
 
 ---
 
-## Question 3 — Contract-first
+## Question 3: Contract-first
 
 <span class="diff diff--staff">Staff</span>
 
@@ -59,9 +59,9 @@ The failure mode without the rule: `shared/` becomes a junk drawer. Everything d
 
 <div class="interview-a">
 
-The schema is the single source of truth. Types and React Query hooks are **generated** from it, so the client and the contract cannot silently disagree — if the schema changes, the generated types change, and every consumer that's now wrong fails to compile. You find the break at build time, not in production.
+The schema is the single source of truth. Types and React Query hooks are **generated** from it, so the client and the contract cannot silently disagree: if the schema changes, the generated types change, and every consumer that's now wrong fails to compile. You find the break at build time, not in production.
 
-Skip it and you hand-write types that mirror the API by memory. They drift the moment the backend changes a field, and nothing tells you — until a `undefined` shows up in the UI. Contract-first turns "hope the types match" into "the compiler proves the types match," and makes cross-cutting fixes (like typing every hook's error) one config change instead of a manual sweep.
+Skip it and you hand-write types that mirror the API by memory. They drift the moment the backend changes a field, and nothing tells you, until a `undefined` shows up in the UI. Contract-first turns "hope the types match" into "the compiler proves the types match," and makes cross-cutting fixes (like typing every hook's error) one config change instead of a manual sweep.
 
 </div>
 </details>
@@ -69,7 +69,7 @@ Skip it and you hand-write types that mirror the API by memory. They drift the m
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/nates-messy-flat">Nate's Messy Flat — structure that scales</a></li>
+<li><a href="../stories/nates-messy-flat">Nate's Messy Flat: structure that scales</a></li>
 </ul>
 </div>
 

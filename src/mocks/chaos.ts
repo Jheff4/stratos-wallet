@@ -40,7 +40,7 @@ export function updateChaosConfig(newConfig: Partial<ChaosConfig>) {
  *   const chaos = await applyChaos();
  *   if (chaos) return chaos;
  */
-// Return type is `Response | null`, not `HttpResponse` — MSW's HttpResponse is
+// Return type is `Response | null`, not `HttpResponse`: MSW's HttpResponse is
 // generic over its body type (HttpResponse<BodyType>), and applyChaos returns
 // several different bodies (JSON error payloads, an empty 503). `Response` is
 // their honest common supertype (HttpResponse extends Response), so callers stay
@@ -54,7 +54,7 @@ export async function applyChaos(): Promise<Response | null> {
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
-  // 2. Random server error — returns a proper 500 with GraphQL-shaped body
+  // 2. Random server error: returns a proper 500 with GraphQL-shaped body
   //    so the fetcher's res.ok check catches it and React Query surfaces an error.
   if (errorRate > 0 && Math.random() < errorRate) {
     return HttpResponse.json(
@@ -63,12 +63,12 @@ export async function applyChaos(): Promise<Response | null> {
     );
   }
 
-  // 3. Message drop — 503 with no body (simulates backend gone)
+  // 3. Message drop: 503 with no body (simulates backend gone)
   if (messageDropRate > 0 && Math.random() < messageDropRate) {
     return new HttpResponse(null, { status: 503 });
   }
 
-  // 4. Partial response — 206 with a truncated / empty data payload
+  // 4. Partial response: 206 with a truncated / empty data payload
   if (partialResponseRate > 0 && Math.random() < partialResponseRate) {
     return HttpResponse.json(
       { data: null, errors: [{ message: 'Partial response (chaos)' }] },

@@ -8,7 +8,7 @@ sidebar_label: "Azeez in the Tunnel"
 
 ---
 
-Azeez is a trader. He lives in Lagos and commutes to the Island every morning on the BRT. The bridge section goes through a dead zone — no signal for about ninety seconds.
+Azeez is a trader. He lives in Lagos and commutes to the Island every morning on the BRT. The bridge section goes through a dead zone: no signal for about ninety seconds.
 
 He's watching a live crypto portfolio app on his phone. The app has a real-time WebSocket feed pushing price updates and transaction events as they happen.
 
@@ -31,7 +31,7 @@ He's staring at wrong numbers and doesn't know it.
 
 Now rewind. Same commute, same tunnel, same dropped connection.
 
-This time, every event the server sends carries a sequence number — a simple counter that increments with every event, never resets, never skips.
+This time, every event the server sends carries a sequence number, a simple counter that increments with every event, never resets, never skips.
 
 ```
 8:47:01am  { seq: 1841, type: 'order_filled',  amount: +280,000 }
@@ -75,7 +75,7 @@ seq: 1921
 seq: 1925  ← jumped from 1921 to 1925
 ```
 
-The client's last sequence was 1921. It receives 1925. It knows immediately: events 1922, 1923, and 1924 are missing. It doesn't have to wait for a reconnect. It can flag the gap in real time, log it, and decide whether to surface a "data may be incomplete — tap to sync" message.
+The client's last sequence was 1921. It receives 1925. It knows immediately: events 1922, 1923, and 1924 are missing. It doesn't have to wait for a reconnect. It can flag the gap in real time, log it, and decide whether to surface a "data may be incomplete, tap to sync" message.
 
 Without sequence numbers, this gap is invisible. The client has no idea that 1922–1924 existed. It just continues as if nothing happened. The balance displayed might be wrong by three events, and nobody knows.
 
@@ -97,13 +97,13 @@ That's what sequence numbers do. They turn a formless stream of events into a nu
 
 ## What happens when the gap is too large
 
-The server keeps a buffer of recent events — Stratos Wallet keeps the last 200. If Azeez's tunnel lasts not 90 seconds but 90 minutes, and 400 events happened while he was underground, the buffer can only replay the most recent 200.
+The server keeps a buffer of recent events: Stratos Wallet keeps the last 200. If Azeez's tunnel lasts not 90 seconds but 90 minutes, and 400 events happened while he was underground, the buffer can only replay the most recent 200.
 
 In that case the server sends a `replay_overflow` message: "I can't replay that far back. You've missed too much. Do a full refetch."
 
-The client then calls the REST/GraphQL API to reload the current state from scratch. Not ideal — but correct. And the user never sees an inconsistent balance. They see a brief loading state and then accurate data.
+The client then calls the REST/GraphQL API to reload the current state from scratch. Not ideal, but correct. And the user never sees an inconsistent balance. They see a brief loading state and then accurate data.
 
-This is the honest tradeoff: the buffer is finite, so very long disconnections require a full reload. But short disconnections — the ones that actually happen to real users — are completely transparent.
+This is the honest tradeoff: the buffer is finite, so very long disconnections require a full reload. But short disconnections (the ones that actually happen to real users) are completely transparent.
 
 ---
 
@@ -129,7 +129,7 @@ For a financial application, a balance derived from a partial event stream is no
 <div class="stratos-related">
 <h4>Related Stories</h4>
 <ul>
-<li><a href="./jons-duplicate-feed">Jon's Duplicate Feed — deduplication, the companion problem</a></li>
-<li><a href="./the-reconnect-storm">The Reconnect Storm — what happens when everyone reconnects at once</a></li>
+<li><a href="./jons-duplicate-feed">Jon's Duplicate Feed: deduplication, the companion problem</a></li>
+<li><a href="./the-reconnect-storm">The Reconnect Storm: what happens when everyone reconnects at once</a></li>
 </ul>
 </div>

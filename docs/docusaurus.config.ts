@@ -1,11 +1,13 @@
 const config = {
-  title: 'Stratos Wallet',
+  title: 'Stratos Docs',
   tagline: 'Architecture & Engineering Guide',
 
-  url: 'http://localhost:7700',
+  // No trailing slash — Docusaurus uses this to build canonical URLs,
+  // the sitemap, and social-card meta tags (og:url, etc.).
+  url: 'https://stratos-wallet.vercel.app',
   baseUrl: '/',
 
-  favicon: 'img/favicon.ico',
+  favicon: 'img/stratos-mark.svg',
 
   organizationName: 'stratos',
   projectName: 'wallet',
@@ -33,9 +35,9 @@ const config = {
 
   themeConfig: {
     navbar: {
-      title: 'Stratos Wallet',
+      title: 'Stratos Docs',
       logo: {
-        alt: 'Stratos Wallet',
+        alt: 'Stratos Docs',
         src: 'img/stratos-mark.svg',
         srcDark: 'img/stratos-mark.svg',
       },
@@ -51,7 +53,24 @@ const config = {
     },
   },
 
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-mermaid',
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        // Builds the search index at build time and ships it as static
+        // files — no external service, no API keys, no crawl approval.
+        // Right-sized for a 46-page docs site.
+        hashed: true,
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: false,
+        // Must match presets[0].docs.routeBasePath above.
+        docsRouteBasePath: '/',
+        language: ['en'],
+      },
+    ],
+  ],
 };
 
 export default config;

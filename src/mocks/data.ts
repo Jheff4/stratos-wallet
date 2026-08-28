@@ -4,8 +4,8 @@
 //
 // ARCHITECTURE PRINCIPLE: The ledger is the single source of truth.
 //
-// No balance is stored anywhere. Every number the UI displays — current
-// balance, balance history, spending by category — is derived by
+// No balance is stored anywhere. Every number the UI displays (current
+// balance, balance history, spending by category) is derived by
 // scanning the ledger at query time. This mirrors how real financial
 // systems work: your bank stores every debit and credit, then derives
 // your balance on demand.
@@ -83,7 +83,7 @@ const walletsByUser = new Map<string, WalletDef[]>([
 ]);
 
 // ------------------------------------------------------------
-// Wallet Access — all callers use these functions
+// Wallet Access: all callers use these functions
 // ------------------------------------------------------------
 
 export function getWalletsForUser(userId: string): WalletDef[] {
@@ -135,8 +135,8 @@ export function addWallet(userId: string, wallet: WalletDef): void {
 //
 // WHY: When a new user registers, we provision a wallet and an
 // initial deposit so the dashboard is not empty on first login.
-// The wallet is stored immediately in walletsByUser — the only
-// store — so every downstream read path will find it.
+// The wallet is stored immediately in walletsByUser, the only
+// store, so every downstream read path will find it.
 // ------------------------------------------------------------
 
 export function createDefaultWalletForUser(userId: string): WalletDef {
@@ -180,7 +180,7 @@ export function createDefaultWalletForUser(userId: string): WalletDef {
 //
 // Persists to sessionStorage so a page refresh does not reset
 // the mock state mid-demo. Uses walletsByUser (the single store)
-// for serialisation — no translation layer needed.
+// for serialisation, no translation layer needed.
 // ------------------------------------------------------------
 
 const STORAGE_KEY = 'stratos_wallet_state';
@@ -221,7 +221,7 @@ export async function saveState(): Promise<void> {
 //
 // Generates 51 realistic ledger entries (one opening deposit +
 // 50 mixed transactions) spread over 30 days for the demo user.
-// Entries reference a1 and a2 — the accounts in DEFAULT_WALLET.
+// Entries reference a1 and a2, the accounts in DEFAULT_WALLET.
 // ------------------------------------------------------------
 
 const CATEGORIES = [
@@ -249,7 +249,7 @@ function randomFrom<T>(arr: readonly T[]): T {
 function generateInitialLedger(): LedgerEntry[] {
   const entries: LedgerEntry[] = [];
 
-  // Opening balance — always first so computeBalance starts positive.
+  // Opening balance, always first so computeBalance starts positive.
   entries.push({
     id: 't0',
     amount: 10_000,
@@ -298,14 +298,36 @@ function generateInitialLedger(): LedgerEntry[] {
   );
 }
 
-// The ledger — append-only, single source of truth.
+// The ledger: append-only, single source of truth.
 export const ledger: LedgerEntry[] = generateInitialLedger();
+
+/**
+ * The one door into the ledger. Every new transaction (whether it comes
+ * from a transfer mutation or a real-time push over the WebSocket) must
+ * be appended here, never by touching `ledger` directly from elsewhere.
+ *
+ * WHY THIS EXISTS:
+ * The live WebSocket transaction feed used to bypass the ledger entirely:
+ * it patched the React Query cache directly so a transaction *appeared* in
+ * the Activity feed and Transaction History, but `computeBalance()` never
+ * saw it, because it never touched this array. Balances silently
+ * disagreed with the feed showing them happen, and the phantom entry
+ * vanished the moment the transaction list was refetched.
+ *
+ * A single write function makes that bug structurally impossible: nothing
+ * can become "a transaction" in this app without becoming a ledger entry,
+ * which every projection (balance, history, spending) reads from.
+ */
+export function addLedgerEntry(entry: LedgerEntry): LedgerEntry {
+  ledger.unshift(entry);
+  return entry;
+}
 
 // ------------------------------------------------------------
 // Derived Projections
 //
 // These functions derive views from the ledger. They do not read
-// from any secondary store. No balance is stored — these compute
+// from any secondary store. No balance is stored: these compute
 // it fresh on every call. In production, a snapshot cache with
 // periodic reconciliation would replace the O(n) scan.
 // ------------------------------------------------------------
@@ -328,14 +350,14 @@ export function computeBalance(accountId: string): number {
  * For each day, sums all ledger entries up to midnight of that day
  * across every account in the wallet.
  *
- * Uses getWalletById — the single store — so this works for
+ * Uses getWalletById, the single store, so this works for
  * both the demo wallet (w1) and any dynamically created wallet.
  */
 export function computeBalanceHistory(
   walletId: string,
   days = 30,
 ): { date: string; balance: number }[] {
-  // Single store lookup — no separate array needed.
+  // Single store lookup, no separate array needed.
   const wallet = getWalletById(walletId);
   if (!wallet) return [];
 
@@ -369,9 +391,9 @@ export function computeBalanceHistory(
 /**
  * Spending by category for a wallet over a date range.
  * Only considers withdrawals and transfers (outflows).
- * Deposits are excluded — they are income, not spending.
+ * Deposits are excluded: they are income, not spending.
  *
- * Uses getWalletById — the single store — so this works for
+ * Uses getWalletById, the single store, so this works for
  * both the demo wallet and any dynamically created wallet.
  */
 export function computeSpendingByCategory(

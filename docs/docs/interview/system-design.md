@@ -18,7 +18,7 @@ These are the high-signal questions. Interviewers at Stripe, Coinbase, and Ramp 
 
 I'd structure this across four layers that work together.
 
-**Layer 1 — The data model.**
+**Layer 1: The data model.**
 
 The balance is never stored. It is derived from an append-only ledger of transactions. `computeBalance(ledgerEntries)` reduces all credits and debits for an account into a current total. This means:
 - There is only one source of truth, so balance and history can never disagree
@@ -27,24 +27,24 @@ The balance is never stored. It is derived from an append-only ledger of transac
 
 The GraphQL schema exposes `Account.balance` as a resolver-computed field, not a stored column.
 
-**Layer 2 — The cache layer.**
+**Layer 2: The cache layer.**
 
-React Query manages the server state. Cache keys are namespaced: `['accounts', walletId]`. `staleTime` is short — 30 seconds — because balances change frequently. On every successful transfer mutation, I invalidate `['accounts', fromId]` and `['accounts', toId]` to force an immediate refetch of only the affected accounts.
+React Query manages the server state. Cache keys are namespaced: `['accounts', walletId]`. `staleTime` is short (30 seconds) because balances change frequently. On every successful transfer mutation, I invalidate `['accounts', fromId]` and `['accounts', toId]` to force an immediate refetch of only the affected accounts.
 
-**Layer 3 — The real-time layer.**
+**Layer 3: The real-time layer.**
 
 A WebSocket connection pushes balance-affecting events. The connection protocol guarantees reliability through three mechanisms:
-1. **Sequence numbers** — every event carries a monotonically increasing `seq`. On reconnect, the client sends its `lastSeq` and the server replays any missed events from its buffer.
-2. **Event deduplication** — every event carries a unique `eventId`. A bounded set of seen IDs discards duplicates from at-least-once delivery.
-3. **Exponential backoff** — reconnections use `min(1000 × 2^attempt + jitter, 30s)` to prevent thundering herd.
+1. **Sequence numbers**: every event carries a monotonically increasing `seq`. On reconnect, the client sends its `lastSeq` and the server replays any missed events from its buffer.
+2. **Event deduplication**: every event carries a unique `eventId`. A bounded set of seen IDs discards duplicates from at-least-once delivery.
+3. **Exponential backoff**: reconnections use `min(1000 × 2^attempt + jitter, 30s)` to prevent thundering herd.
 
-**Layer 4 — The consistency guarantee.**
+**Layer 4: The consistency guarantee.**
 
-After every mutation — success or failure — I call `queryClient.invalidateQueries()` for the affected accounts. This ensures the displayed balance is always the server's authoritative value, not the optimistic assumption. The optimistic update provides instant feedback; the invalidation ensures correctness.
+After every mutation (success or failure) I call `queryClient.invalidateQueries()` for the affected accounts. This ensures the displayed balance is always the server's authoritative value, not the optimistic assumption. The optimistic update provides instant feedback; the invalidation ensures correctness.
 
 **What I'd add at scale:**
 
-Balance history queries become expensive as ledger entries accumulate — O(n) per account. Production systems solve this with periodic balance snapshots: a saved checkpoint at time T, so reads only replay entries after T rather than the full history.
+Balance history queries become expensive as ledger entries accumulate: O(n) per account. Production systems solve this with periodic balance snapshots: a saved checkpoint at time T, so reads only replay entries after T rather than the full history.
 
 </div>
 
@@ -64,7 +64,7 @@ I separate state into three categories with different storage:
 
 **Server state → React Query.**
 
-Anything that originates from or is authorised by the backend: wallet data, account balances, transaction history, spending analytics. React Query is the right tool because it handles caching, deduplication of in-flight requests, background refetching, and optimistic mutations with rollback — all without me writing that infrastructure myself.
+Anything that originates from or is authorised by the backend: wallet data, account balances, transaction history, spending analytics. React Query is the right tool because it handles caching, deduplication of in-flight requests, background refetching, and optimistic mutations with rollback, all without me writing that infrastructure myself.
 
 Cache keys are scoped to the data's identity:
 ```
@@ -78,7 +78,7 @@ This scoping makes targeted invalidation precise: a transfer mutation invalidate
 
 **Global client state → Zustand.**
 
-Session data (authenticated user, token), UI preferences (theme, selected wallet). These are client-owned — the backend doesn't have an opinion on them — and they need to be accessible across unrelated components. Zustand's minimal API keeps this lean.
+Session data (authenticated user, token), UI preferences (theme, selected wallet). These are client-owned (the backend doesn't have an opinion on them) and they need to be accessible across unrelated components. Zustand's minimal API keeps this lean.
 
 **Local UI state → useState / useReducer.**
 
@@ -105,7 +105,7 @@ Use the most local storage that works. Only promote state upward when two or mor
 Idempotency key, generated client-side before the request, sent with every attempt.
 
 ```ts
-// Generated once when the form mounts — not on every tap
+// Generated once when the form mounts, not on every tap
 const idempotencyKey = useRef(crypto.randomUUID());
 
 // The same key is sent on every retry of the same user action
@@ -131,7 +131,7 @@ Server-generated keys require a round-trip before the form can be submitted, add
 
 **What about the idempotency store on the server?**
 
-In production it needs a TTL — typically 24 hours to a week, depending on retry windows — and it needs to survive server restarts (so a database, not in-memory). In Stratos Wallet's mock layer it's an in-memory Map, which is appropriate for a development environment.
+In production it needs a TTL (typically 24 hours to a week, depending on retry windows) and it needs to survive server restarts (so a database, not in-memory). In Stratos Wallet's mock layer it's an in-memory Map, which is appropriate for a development environment.
 
 </div>
 
@@ -175,7 +175,7 @@ queryClient.setQueryData(['transactions', accountId], (old) => ({
 
 Re-fetching the list on every new transaction would reset scroll position and re-render the entire feed. In-place cache update is surgical.
 
-**At scale — the deduplication problem.**
+**At scale: the deduplication problem.**
 
 If the user has the feed open for a long time, a transaction might arrive via WebSocket and then appear again in the next paginated fetch. I deduplicate by `id` before rendering:
 
@@ -185,9 +185,9 @@ const uniqueTransactions = Array.from(
 );
 ```
 
-**At very high scale — the ledger performance problem.**
+**At very high scale: the ledger performance problem.**
 
-A transaction history that's O(n) per account — scanning the entire ledger on every request — breaks at millions of entries per account. The production solution is: use a dedicated read model for transaction history (a pre-indexed table ordered by `createdAt desc, id`), separate from the ledger which is ordered by append time. The ledger remains the source of truth; the read model is an indexed projection optimised for query.
+A transaction history that's O(n) per account (scanning the entire ledger on every request) breaks at millions of entries per account. The production solution is: use a dedicated read model for transaction history (a pre-indexed table ordered by `createdAt desc, id`), separate from the ledger which is ordered by append time. The ledger remains the source of truth; the read model is an indexed projection optimised for query.
 
 </div>
 
@@ -203,30 +203,30 @@ A transaction history that's O(n) per account — scanning the entire ledger on 
 
 Three layers of testing, each targeting different failure modes.
 
-**Unit tests — the deduplication logic.**
+**Unit tests: the deduplication logic.**
 
 Test the `isDuplicate()` function in isolation: given a set of seen event IDs, does it correctly return true for duplicates and false for new events? Does it evict the oldest ID when the window is full? Does it handle events without an `eventId` gracefully?
 
-These are pure function tests — no WebSocket required.
+These are pure function tests: no WebSocket required.
 
-**Integration tests — the full mutation flow.**
+**Integration tests: the full mutation flow.**
 
 Using MSW to intercept the GraphQL mutation, test the three-phase optimistic update cycle:
-1. `onMutate` — does the cache update immediately?
-2. `onError` — does the snapshot restore correctly?
-3. `onSettled` — does invalidation trigger a refetch?
+1. `onMutate`: does the cache update immediately?
+2. `onError`: does the snapshot restore correctly?
+3. `onSettled`: does invalidation trigger a refetch?
 
 These run in jsdom with React Testing Library and don't need a real server.
 
-**Chaos tests — the reliability protocol.**
+**Chaos tests: the reliability protocol.**
 
 Enable `duplicateWsEvents` chaos preset and verify the feed doesn't show duplicate transactions. Enable `websocketInstability` and verify the balance is correct after reconnection. Enable `packetLoss` and verify the "sequence gap detected" log entry appears.
 
-These tests run against the full application with the chaos system active — the closest thing to production conditions in a development environment.
+These tests run against the full application with the chaos system active: the closest thing to production conditions in a development environment.
 
 **The principle:**
 
-Don't test implementation details — test observable behaviour. The test for deduplication is not "was `seenEventIds.add()` called?" — it's "does the transaction appear once in the feed, not twice?" The deduplication mechanism can change; the observable contract should not.
+Don't test implementation details: test observable behaviour. The test for deduplication is not "was `seenEventIds.add()` called?": it's "does the transaction appear once in the feed, not twice?" The deduplication mechanism can change; the observable contract should not.
 
 </div>
 
@@ -234,15 +234,15 @@ Don't test implementation details — test observable behaviour. The test for de
 
 ## How do you build and test a frontend before the backend exists?
 
-<div class="interview-q">You're hired to build a fintech dashboard but the backend team is months behind. How do you build real features — including failure handling — without a server?</div>
+<div class="interview-q">You're hired to build a fintech dashboard but the backend team is months behind. How do you build real features (including failure handling) without a server?</div>
 
 <div class="interview-a">
 
-I mock at the **network layer**, not in the app. Using MSW (Mock Service Worker), a Service Worker intercepts the app's real `fetch` calls and answers them. The crucial property: the app makes genuine HTTP requests and has no idea the backend is fake. Components, hooks, and the fetcher are identical to what ships — when the real server arrives, I change zero lines above the network boundary.
+I mock at the **network layer**, not in the app. Using MSW (Mock Service Worker), a Service Worker intercepts the app's real `fetch` calls and answers them. The crucial property: the app makes genuine HTTP requests and has no idea the backend is fake. Components, hooks, and the fetcher are identical to what ships: when the real server arrives, I change zero lines above the network boundary.
 
 That rules out the alternatives I'd reject in the interview: stubbing the fetch function or mocking data modules leaves mock-shaped seams *inside* the app and tests a different code path than production. Network interception tests the real path.
 
-On top of the mock backend I add a **failure-injection layer**. Every mock resolver begins with the same guard — `const chaos = await applyChaos(); if (chaos) return chaos;` — so a single, uniform splice point makes *every* endpoint able to return latency, a 500, a dropped 503, or a partial 206 on demand, controlled from a dev console. And the injected failures are shaped like real ones (a 500 carrying a GraphQL `errors` body, a 503 with no body) so they exercise the exact branches my error handling must survive. The result: I build every loading, empty, error, and partial state *while the failure is actively happening*, instead of discovering them in production.
+On top of the mock backend I add a **failure-injection layer**. Every mock resolver begins with the same guard (`const chaos = await applyChaos(); if (chaos) return chaos;`) so a single, uniform splice point makes *every* endpoint able to return latency, a 500, a dropped 503, or a partial 206 on demand, controlled from a dev console. And the injected failures are shaped like real ones (a 500 carrying a GraphQL `errors` body, a 503 with no body) so they exercise the exact branches my error handling must survive. The result: I build every loading, empty, error, and partial state *while the failure is actively happening*, instead of discovering them in production.
 
 </div>
 
@@ -252,9 +252,9 @@ On top of the mock backend I add a **failure-injection layer**. Every mock resol
 
 <div class="interview-a">
 
-The hook computes a **cache key** (e.g. `['Accounts', { walletId }]`) and asks React Query for it. **Decision one — the cache check:** if a fresh entry exists (within `staleTime`), it's returned with no network call at all. Most invocations stop here; calling a hook is *subscribing to a cache key*, not firing a request.
+The hook computes a **cache key** (e.g. `['Accounts', { walletId }]`) and asks React Query for it. **Decision one, the cache check:** if a fresh entry exists (within `staleTime`), it's returned with no network call at all. Most invocations stop here; calling a hook is *subscribing to a cache key*, not firing a request.
 
-On a miss, the `queryFn` runs the fetcher, which makes a real `POST /graphql`. MSW intercepts it and matches a handler. **Decision two — the chaos gate:** the handler runs `applyChaos()` first, which can delay or short-circuit with a failure before any real work. If it passes, the handler reads the fake DB and **derives** the balance from the ledger (`computeBalance`) rather than reading a stored field. The JSON returns through the fetcher, which checks `json.errors` and either throws an `Error` (→ React Query `error` state → error boundary) or returns `data`. React Query caches it under the key, marks it fresh, and the component renders.
+On a miss, the `queryFn` runs the fetcher, which makes a real `POST /graphql`. MSW intercepts it and matches a handler. **Decision two, the chaos gate:** the handler runs `applyChaos()` first, which can delay or short-circuit with a failure before any real work. If it passes, the handler reads the fake DB and **derives** the balance from the ledger (`computeBalance`) rather than reading a stored field. The JSON returns through the fetcher, which checks `json.errors` and either throws an `Error` (→ React Query `error` state → error boundary) or returns `data`. React Query caches it under the key, marks it fresh, and the component renders.
 
 So the two decisions that govern everything are *cache freshness* (does a request even happen?) and *the chaos gate* (does this request fail?). Naming those two unprompted is what shows you actually understand the data flow rather than reciting "the hook fetches data."
 

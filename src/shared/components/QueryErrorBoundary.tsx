@@ -3,7 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
-// `error` is typed `unknown`, not `Error`, on purpose — this matches
+// `error` is typed `unknown`, not `Error`, on purpose: this matches
 // react-error-boundary's FallbackProps and the reality of JavaScript: you can
 // `throw` anything (a string, an object, undefined). With strict mode's
 // useUnknownInCatchVariables, the compiler forces us to prove what we caught
@@ -15,17 +15,17 @@ interface ErrorFallbackProps {
 }
 
 // Narrow an unknown thrown value to a displayable message. This is the single
-// choke point where `unknown` becomes a `string` — everything downstream is safe.
+// choke point where `unknown` becomes a `string`, everything downstream is safe.
 function toMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 // Interview defense:
 // "Two type-safety decisions meet here. First, error boundaries receive `unknown`,
-//  not `Error` — because in JS you can throw anything, so I narrow once in
+//  not `Error`, because in JS you can throw anything, so I narrow once in
 //  `toMessage` and the UI never assumes a shape it can't prove. Second, our
 //  GraphQL hooks used to type `.error` as `unknown` too, which doesn't just force
-//  casts — it silently poisons JSX, because `unknown && <div/>` is `unknown`,
+//  casts, it silently poisons JSX, because `unknown && <div/>` is `unknown`,
 //  which isn't a valid ReactNode. I fixed that at the source by setting
 //  `errorType: 'Error'` in codegen, so every query/mutation across the app gets
 //  typed errors from one config line instead of per-call casts. That's the

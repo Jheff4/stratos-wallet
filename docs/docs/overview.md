@@ -2,7 +2,7 @@
 
 ## What Stratos Wallet is
 
-**Stratos Wallet** is a frontend-heavy fintech application engineered to the standard expected at senior and staff level. It is not a tutorial project or a CRUD demo. Every architectural decision — folder structure, data model, real-time protocol, cache strategy — was made deliberately and documented.
+**Stratos Wallet** is a frontend-heavy fintech application engineered to the standard expected at senior and staff level. It is not a tutorial project or a CRUD demo. Every architectural decision (folder structure, data model, real-time protocol, cache strategy) was made deliberately and documented.
 
 The application is a personal finance dashboard with live transaction feeds, balance history, fund transfers, spending analytics, a real-time activity feed, and a full resilience simulation layer.
 
@@ -34,7 +34,7 @@ This is the difference between building something that works and being able to d
 
 Every real-time subsystem is built assuming failure. The WebSocket hook handles duplicate delivery, dropped messages, and missed events after reconnection. GraphQL handlers simulate latency, partial failures, and timeouts via a chaos system with 15+ presets.
 
-The chaos system is not a separate testing tool. It is a first-class development tool — toggle it from the sidebar without leaving the page you are testing.
+The chaos system is not a separate testing tool. It is a first-class development tool: toggle it from the sidebar without leaving the page you are testing.
 
 ### Frontend architecture at scale
 
@@ -53,8 +53,8 @@ The chaos system is not a separate testing tool. It is a first-class development
 | Vite | Build tool and dev server |
 | React Query v5 | Server state management, caching, optimistic mutations |
 | GraphQL + Codegen | API contract, generated typed hooks |
-| MSW v2 | Mock service worker — intercepts GraphQL and REST at the network layer |
-| Zustand | Global client state — WS status, notifications, chaos panel open/close |
+| MSW v2 | Mock service worker: intercepts GraphQL and REST at the network layer |
+| Zustand | Global client state: WS status, notifications, chaos panel open/close |
 | Recharts | Balance trend, portfolio allocation, spending charts |
 | WebSocket | Real-time transaction feed with seq, dedup, replay reliability protocol |
 | Vitest | Unit and integration tests |
@@ -68,7 +68,7 @@ The chaos system is not a separate testing tool. It is a first-class development
 npm install
 
 # Start the WebSocket server (real-time events)
-cd server && npx ts-node src/index.ts
+cd server && pnpm dev
 
 # Start the application (separate terminal)
 npm run dev

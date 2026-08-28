@@ -46,7 +46,7 @@ sequenceDiagram
   end
 ```
 
-<p class="diagram-caption">Optimistic updates give instant feedback. The snapshot ensures rollback is always available. <code>onSettled</code> always refetches — the server's answer is the final truth.</p>
+<p class="diagram-caption">Optimistic updates give instant feedback. The snapshot ensures rollback is always available. <code>onSettled</code> always refetches: the server's answer is the final truth.</p>
 
 ## Consequences
 
@@ -56,16 +56,16 @@ sequenceDiagram
 <div class="stratos-related">
 <h4>Engineering Stories</h4>
 <ul>
-<li><a href="../stories/sams-double-transfer">Sam's Double Transfer — idempotency keys</a></li>
-<li><a href="../stories/the-optimistic-chef">The Optimistic Chef — optimistic updates & rollback</a></li>
+<li><a href="../stories/sams-double-transfer">Sam's Double Transfer: idempotency keys</a></li>
+<li><a href="../stories/the-optimistic-chef">The Optimistic Chef: optimistic updates & rollback</a></li>
 </ul>
 </div>
 
 <div class="stratos-related">
 <h4>Interview Prep</h4>
 <ul>
-<li><a href="../interview/system-design">System Design — handling duplicate submissions</a></li>
-<li><a href="../interview/react-architecture">React Architecture — optimistic updates failure modes</a></li>
+<li><a href="../interview/system-design">System Design: handling duplicate submissions</a></li>
+<li><a href="../interview/react-architecture">React Architecture: optimistic updates failure modes</a></li>
 </ul>
 </div>
 

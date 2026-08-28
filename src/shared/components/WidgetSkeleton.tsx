@@ -23,7 +23,7 @@ export default function WidgetSkeleton({ height = 300, chart = false }: WidgetSk
       {/* Card body skeleton */}
       <div className="card-body" style={{ paddingTop: 'var(--space-4)' }}>
         {chart ? (
-          /* Chart shape — mimic an area/bar chart */
+          /* Chart shape: mimic an area/bar chart */
           <div style={{ position: 'relative', height: height - 100, overflow: 'hidden' }}>
             {/* Y-axis labels */}
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 20 }}>

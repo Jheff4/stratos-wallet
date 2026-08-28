@@ -5,7 +5,7 @@ sidebar_label: "Overview"
 
 # Interview Preparation
 
-This section is specifically for interview preparation. It assumes you have read and understood the rest of the documentation. The goal here is to take that understanding and translate it into confident, precise answers — the kind that make interviewers lean forward.
+This section is specifically for interview preparation. It assumes you have read and understood the rest of the documentation. The goal here is to take that understanding and translate it into confident, precise answers: the kind that make interviewers lean forward.
 
 ---
 
@@ -13,9 +13,9 @@ This section is specifically for interview preparation. It assumes you have read
 
 Each page contains questions organised by what level of answer is expected. Three levels:
 
-- <span class="diff diff--mid">Mid</span> — the correct answer, clean and clear. A senior candidate who doesn't know this raises flags.
-- <span class="diff diff--senior">Senior</span> — the expected answer at Stripe, Coinbase, Ramp, Shopify. Demonstrates judgment, not just knowledge.
-- <span class="diff diff--staff">Staff</span> — the answer that ends the interview early because the interviewer knows they're talking to someone who has thought deeply about the space. Surfaces tradeoffs, failure modes, and evolution paths.
+- <span class="diff diff--mid">Mid</span>: the correct answer, clean and clear. A senior candidate who doesn't know this raises flags.
+- <span class="diff diff--senior">Senior</span>: the expected answer at Stripe, Coinbase, Ramp, Shopify. Demonstrates judgment, not just knowledge.
+- <span class="diff diff--staff">Staff</span>: the answer that ends the interview early because the interviewer knows they're talking to someone who has thought deeply about the space. Surfaces tradeoffs, failure modes, and evolution paths.
 
 ---
 
@@ -23,13 +23,13 @@ Each page contains questions organised by what level of answer is expected. Thre
 
 When Stripe, Coinbase, or Meta interviews a senior/staff frontend engineer, they are not testing whether you know React hooks. They are evaluating:
 
-**System design judgment** — Can you reason about how a system fails, not just how it works? Can you explain why one architectural choice is better than another, under what conditions, and when you'd choose differently?
+**System design judgment**: Can you reason about how a system fails, not just how it works? Can you explain why one architectural choice is better than another, under what conditions, and when you'd choose differently?
 
-**Depth over breadth** — Can you go three levels deep on any decision you've made? "I used React Query" is a start. "I chose React Query over Apollo because our backend is GraphQL but we needed more granular cache invalidation control than Apollo's normalized cache provides, and we were already using server state patterns that mapped directly to React Query's model" is what they're listening for.
+**Depth over breadth**: Can you go three levels deep on any decision you've made? "I used React Query" is a start. "I chose React Query over Apollo because our backend is GraphQL but we needed more granular cache invalidation control than Apollo's normalized cache provides, and we were already using server state patterns that mapped directly to React Query's model" is what they're listening for.
 
-**Production thinking** — Do you think about edge cases, failure modes, and at-scale behaviour before you're asked? Do your answers include "and here's what I'd do when this breaks" without being prompted?
+**Production thinking**: Do you think about edge cases, failure modes, and at-scale behaviour before you're asked? Do your answers include "and here's what I'd do when this breaks" without being prompted?
 
-**Communication** — Can you explain complex engineering decisions clearly to a product manager, to a junior engineer, and to a staff engineer — adjusting depth and vocabulary for each?
+**Communication**: Can you explain complex engineering decisions clearly to a product manager, to a junior engineer, and to a staff engineer, adjusting depth and vocabulary for each?
 
 This section helps you practice all four.
 

@@ -8,7 +8,7 @@ Real-time questions are where frontend interviews get deep. Most candidates know
 
 ---
 
-## WebSocket vs SSE vs polling — when do you use each?
+## WebSocket vs SSE vs polling: when do you use each?
 
 <span class="diff diff--senior">Senior</span>
 
@@ -16,22 +16,22 @@ Real-time questions are where frontend interviews get deep. Most candidates know
 
 <div class="interview-a">
 
-**Long polling** — The client makes an HTTP request and the server holds it open until new data is available (or a timeout). Then the client immediately makes another request.
+**Long polling**: The client makes an HTTP request and the server holds it open until new data is available (or a timeout). Then the client immediately makes another request.
 
 Best for: legacy environments where WebSocket is blocked by proxies, or when you need a simple push mechanism with no infrastructure changes.
 Avoid when: you need low latency or high message frequency. Each response-request cycle adds overhead.
 
-**Server-Sent Events (SSE)** — A persistent HTTP connection over which the server pushes text events. The browser handles reconnection natively. HTTP/2 allows multiplexing multiple SSE streams.
+**Server-Sent Events (SSE)**: A persistent HTTP connection over which the server pushes text events. The browser handles reconnection natively. HTTP/2 allows multiplexing multiple SSE streams.
 
 Best for: unidirectional server-to-client push: notifications, live feeds, price updates, status streams. Simple to implement, works through most proxies.
-Avoid when: you need bidirectional communication. SSE is one-way only — client messages need a separate HTTP request.
+Avoid when: you need bidirectional communication. SSE is one-way only: client messages need a separate HTTP request.
 
-**WebSocket** — A persistent, full-duplex TCP connection. Both sides can send at any time after the handshake.
+**WebSocket**: A persistent, full-duplex TCP connection. Both sides can send at any time after the handshake.
 
 Best for: bidirectional communication (chat, collaborative editing, trading platforms), high-frequency updates where HTTP overhead matters, scenarios where you need the client to send data back on the same connection (subscriptions, ACKs, trade orders).
-Avoid when: you only need server-to-client push and SSE would work — WebSocket adds complexity (custom reconnect logic, proxy issues, stateful server connections) that SSE handles automatically.
+Avoid when: you only need server-to-client push and SSE would work: WebSocket adds complexity (custom reconnect logic, proxy issues, stateful server connections) that SSE handles automatically.
 
-**In Stratos Wallet:** WebSocket was chosen for bidirectional capability needed by future trading features, and because it allows the client to send `{ type: 'subscribe', lastSeq: N }` for replay — which requires client-to-server messaging.
+**In Stratos Wallet:** WebSocket was chosen for bidirectional capability needed by future trading features, and because it allows the client to send `{ type: 'subscribe', lastSeq: N }` for replay, which requires client-to-server messaging.
 
 </div>
 
@@ -47,19 +47,19 @@ Avoid when: you only need server-to-client push and SSE would work — WebSocket
 
 A sequence number is a monotonically increasing integer assigned to every event the server emits. The client tracks the last sequence it received.
 
-**Problem 1 — Gap detection.**
+**Problem 1: Gap detection.**
 
-Without sequence numbers, if the client misses events during a disconnect, it has no way to know. The feed looks continuous. The balance might be wrong by exactly the amount of the missed transactions — and nobody knows.
+Without sequence numbers, if the client misses events during a disconnect, it has no way to know. The feed looks continuous. The balance might be wrong by exactly the amount of the missed transactions, and nobody knows.
 
 With sequence numbers: the client receives event seq=1921, then after a reconnect receives seq=1925. It knows events 1922, 1923, 1924 are missing. It can request a replay. Or at minimum it can log "sequence gap detected" and trigger a full refetch.
 
-**Problem 2 — Replay protocol.**
+**Problem 2: Replay protocol.**
 
 Without sequence numbers, a reconnecting client has no anchor. The server can't know where to start replaying.
 
-With sequence numbers: the client sends `{ type: 'subscribe', lastSeq: 1921 }`. The server checks its event buffer for events with `seq > 1921` and replays them in order. The client processes them with the same handlers as live events — because they are structurally identical.
+With sequence numbers: the client sends `{ type: 'subscribe', lastSeq: 1921 }`. The server checks its event buffer for events with `seq > 1921` and replays them in order. The client processes them with the same handlers as live events, because they are structurally identical.
 
-**Problem 3 — Ordering verification.**
+**Problem 3: Ordering verification.**
 
 In distributed systems, events can be delivered out of order. Without sequence numbers, a client processing event B then event A might show state B→A when the correct state is A→B.
 
@@ -67,11 +67,11 @@ With sequence numbers: the client can detect that seq=43 arrived before seq=42 a
 
 **What sequences don't solve:**
 
-Deduplication. Two deliveries of the same event have the same `seq`. The client that has already processed seq=42 receives it again — the sequence number doesn't tell it "you've seen this before." That's what `eventId` is for. Seq and eventId solve different problems and you need both.
+Deduplication. Two deliveries of the same event have the same `seq`. The client that has already processed seq=42 receives it again: the sequence number doesn't tell it "you've seen this before." That's what `eventId` is for. Seq and eventId solve different problems and you need both.
 
 </div>
 
-<div class="tip">The interviewer will often follow up: "what if the server restarts and the sequence counter resets?" The production answer: the sequence should be stored durably (database, not in-memory), or use a globally unique cursor like a timestamp-based ID (Snowflake IDs, ULIDs) that doesn't reset. Stratos Wallet's in-memory counter resets on server restart — an acknowledged limitation appropriate for a development environment.</div>
+<div class="tip">The interviewer will often follow up: "what if the server restarts and the sequence counter resets?" The production answer: the sequence should be stored durably (database, not in-memory), or use a globally unique cursor like a timestamp-based ID (Snowflake IDs, ULIDs) that doesn't reset. Stratos Wallet's in-memory counter resets on server restart: an acknowledged limitation appropriate for a development environment.</div>
 
 ---
 
@@ -87,7 +87,7 @@ Deduplication. Two deliveries of the same event have the same `seq`. The client 
 
 Every client retries at a fixed 1-second interval. The server goes down at T=0. At T=1, all 50,000 clients reconnect simultaneously. The server, just restarted with a cold cache and no warmed connection pool, receives 50,000 connection requests in one second. It hits resource limits and crashes or drops most connections. Those clients retry at T=2. Same thing. The server never stabilises.
 
-This is the thundering herd problem. The solution isn't a bigger server — it's distributing the reconnect load over time.
+This is the thundering herd problem. The solution isn't a bigger server: it's distributing the reconnect load over time.
 
 **With exponential backoff + jitter:**
 
@@ -119,7 +119,7 @@ Without the exponential part, 50,000 clients each retrying every second with ran
 
 <div class="interview-a">
 
-Every event the server emits carries a unique `eventId` — a UUID generated at emission time, stable across any replay of the same event.
+Every event the server emits carries a unique `eventId`: a UUID generated at emission time, stable across any replay of the same event.
 
 On the client, I maintain a bounded `Set<string>` of recently seen event IDs:
 
@@ -145,7 +145,7 @@ function processMessage(data: WSMessage) {
 
 **Why bounded?**
 
-Storing every `eventId` forever would eventually exhaust memory. Duplicates from network retransmission arrive within milliseconds to seconds of the original — not hours later. A 200-event window is enough to catch any practical duplicate delivery scenario.
+Storing every `eventId` forever would eventually exhaust memory. Duplicates from network retransmission arrive within milliseconds to seconds of the original, not hours later. A 200-event window is enough to catch any practical duplicate delivery scenario.
 
 **In production, use a TTL-based window instead:**
 
@@ -153,7 +153,7 @@ A count-based window might evict recent IDs on a high-frequency feed. A time-bas
 
 **Why not deduplicate by sequence number?**
 
-Sequence numbers detect *gaps*, not duplicates. Two deliveries of event seq=42 both carry seq=42. The sequence tells you "I've seen 42 before" — but 42 in a sequence could be a gap you're filling via replay. The eventId is the fingerprint that unambiguously identifies a specific event emission, regardless of when it arrives.
+Sequence numbers detect *gaps*, not duplicates. Two deliveries of event seq=42 both carry seq=42. The sequence tells you "I've seen 42 before," but 42 in a sequence could be a gap you're filling via replay. The eventId is the fingerprint that unambiguously identifies a specific event emission, regardless of when it arrives.
 
 </div>
 

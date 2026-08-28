@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DemoBadge from '@shared/components/DemoBadge';
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
@@ -13,6 +14,7 @@ export default function SettingsPage() {
       <div className="page-header">
         <h1 className="page-title">Settings</h1>
         <p className="page-subtitle">Manage your profile and preferences</p>
+        <DemoBadge stub concepts={[]} />
       </div>
 
       <div className="page-body flex-col gap-5" style={{ maxWidth: 620 }}>
@@ -47,7 +49,7 @@ export default function SettingsPage() {
               </div>
               <div className="form-group">
                 <label className="form-label">Last Name</label>
-                <input className="form-control" defaultValue="" placeholder="—" />
+                <input className="form-control" defaultValue="" placeholder="-" />
               </div>
             </div>
             <div className="form-group">

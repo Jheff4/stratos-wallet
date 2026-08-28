@@ -1,6 +1,6 @@
 # Transfers Feature
 
-A transfer moves funds from one account to another within the same wallet. It is the highest-stakes user action in the application: a bug here produces incorrect balances, a broken experience, or — in a real system — a financial loss.
+A transfer moves funds from one account to another within the same wallet. It is the highest-stakes user action in the application: a bug here produces incorrect balances, a broken experience, or (in a real system) a financial loss.
 
 ---
 
@@ -16,13 +16,13 @@ A transfer is atomic from the user's perspective: either both sides happen or ne
 
 The transfer flow follows this sequence:
 
-1. **User fills the transfer form** — selects source account, destination account, and amount.
-2. **Client generates an idempotency key** — `crypto.randomUUID()` before the mutation is sent.
-3. **Optimistic update applied** — the local cache reflects the expected new balances immediately.
-4. **Mutation sent** — `transferFunds` GraphQL mutation with `fromAccountId`, `toAccountId`, `amount`, `idempotencyKey`.
-5. **Server processes or deduplicates** — if the server has seen this idempotency key before, it returns the cached result without creating a second entry.
-6. **On success** — `onSettled` invalidates `['accounts', fromId]` and `['accounts', toId]`. Fresh balances are fetched.
-7. **On error** — `onError` restores the snapshot taken in `onMutate`. The UI returns to the pre-transfer state.
+1. **User fills the transfer form**: selects source account, destination account, and amount.
+2. **Client generates an idempotency key**: `crypto.randomUUID()` before the mutation is sent.
+3. **Optimistic update applied**: the local cache reflects the expected new balances immediately.
+4. **Mutation sent**: `transferFunds` GraphQL mutation with `fromAccountId`, `toAccountId`, `amount`, `idempotencyKey`.
+5. **Server processes or deduplicates**: if the server has seen this idempotency key before, it returns the cached result without creating a second entry.
+6. **On success**: `onSettled` invalidates `['accounts', fromId]` and `['accounts', toId]`. Fresh balances are fetched.
+7. **On error**: `onError` restores the snapshot taken in `onMutate`. The UI returns to the pre-transfer state.
 
 ---
 
@@ -38,7 +38,7 @@ With idempotency, the server detects the duplicate key and returns the result of
 
 ### How it works
 
-The client generates the key with `crypto.randomUUID()` **before** the form is submitted — not inside the mutation handler. This ensures the same key is used for all retry attempts of the same user action.
+The client generates the key with `crypto.randomUUID()` **before** the form is submitted, not inside the mutation handler. This ensures the same key is used for all retry attempts of the same user action.
 
 ```ts
 const idempotencyKey = useRef(crypto.randomUUID());
@@ -107,7 +107,7 @@ useMutation({
   },
 
   onSettled: () => {
-    // Always refetch — whether the mutation succeeded or failed
+    // Always refetch: whether the mutation succeeded or failed
     queryClient.invalidateQueries({ queryKey: ['accounts', walletId] });
   },
 })

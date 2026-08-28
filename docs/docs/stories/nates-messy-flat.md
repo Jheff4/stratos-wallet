@@ -8,7 +8,7 @@ sidebar_label: "Nate's Messy Flat"
 
 ---
 
-Nate moves into a flat with three roommates. They all work in different fields — Nate's in engineering, Sam's in design, Jon's a writer, Azeez does finance. 
+Nate moves into a flat with three roommates. They all work in different fields: Nate's in engineering, Sam's in design, Jon's a writer, Azeez does finance. 
 
 They need a system for organising shared stuff. They try two approaches.
 
@@ -38,7 +38,7 @@ When Sam's design work expands, it expands into Sam's space, not a shared space 
 
 When Nate and Sam work from home together, they're in different zones. No collisions.
 
-Shared things — the wifi router, the kitchen staples, the vacuum — go in a common area that's clearly labelled as shared. Not one person's zone. Genuinely shared.
+Shared things (the wifi router, the kitchen staples, the vacuum) go in a common area that's clearly labelled as shared. Not one person's zone. Genuinely shared.
 
 ---
 
@@ -69,7 +69,7 @@ src/
 
 To understand the transfer feature, you visit `components/`, `hooks/`, and `types/`. Three separate drawers. When two engineers work on transfers and accounts at the same time, they're both in `components/` and `hooks/`. Git sees changes to the same directories and often produces merge conflicts on files that have nothing to do with each other.
 
-To delete the trading feature? You'd need to know which components, hooks, and types belong to it — information the directory structure doesn't give you. You have to grep through the code to find it.
+To delete the trading feature? You'd need to know which components, hooks, and types belong to it, information the directory structure doesn't give you. You have to grep through the code to find it.
 
 ---
 
@@ -104,9 +104,9 @@ Two engineers working on transfers and accounts simultaneously work in completel
 
 ## The shared zone discipline
 
-The hardest part of the flat's second arrangement is deciding what goes in the common area. Leave it vague and people start dumping things there that aren't really shared — they just weren't sure where else to put them. Eventually the common area becomes a new version of the mess they were trying to escape.
+The hardest part of the flat's second arrangement is deciding what goes in the common area. Leave it vague and people start dumping things there that aren't really shared: they just weren't sure where else to put them. Eventually the common area becomes a new version of the mess they were trying to escape.
 
-Same problem in code. Leave `shared/` without a clear rule and it fills up with everything nobody wanted to put somewhere specific. A logger, a date formatter, a weirdly specific component that only one feature uses — it all ends up in shared because it was the path of least resistance.
+Same problem in code. Leave `shared/` without a clear rule and it fills up with everything nobody wanted to put somewhere specific. A logger, a date formatter, a weirdly specific component that only one feature uses: it all ends up in shared because it was the path of least resistance.
 
 The rule that keeps it clean: something belongs in `shared/` only if it is genuinely used by three or more features, or if it represents a system-wide concern (logging, error handling, HTTP client) that no single feature should own.
 
